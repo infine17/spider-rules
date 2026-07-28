@@ -13,13 +13,13 @@
                 extend: {
                     colors: {
                         spider: {
-                            black: '#000000',
-                            panel: 'rgba(10, 15, 30, 0.6)', /* Glass dark blue/black */
-                            border: 'rgba(37, 99, 235, 0.4)', /* Dark blue border */
+                            black: '#030508',
+                            panel: 'rgba(10, 15, 30, 0.45)', /* Glass dark blue/black */
+                            border: 'rgba(37, 99, 235, 0.3)', /* Dark blue border */
                             red: '#e62429',
-                            darkred: '#991b1b',
+                            darkred: '#880e15',
                             blue: '#2563eb',
-                            lightblue: '#60a5fa',
+                            darkblue: '#0d235c',
                             text: '#cbd5e1'
                         }
                     },
@@ -34,27 +34,73 @@
 
     <style>
         body {
-            background-color: #000000;
+            background-color: #030508;
             color: #f8fafc;
             margin: 0;
             overflow-x: hidden;
             scroll-behavior: smooth;
         }
 
-        /* Fixed Canvas Background */
-        #webCanvas {
+        /* --- Symbiote Liquid Background --- */
+        .liquid-bg {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
             z-index: -1;
-            pointer-events: none; /* Let clicks pass through to the site */
+            overflow: hidden;
+            background: #030508;
         }
 
-        /* Custom Scrollbar - Red & Blue */
+        .liquid-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.6;
+            mix-blend-mode: screen;
+            animation: floatBlob 25s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .blob-red {
+            width: 55vw;
+            height: 55vw;
+            background: #880e15; /* Deep Crimson */
+            top: -10%;
+            left: -10%;
+            animation-delay: 0s;
+        }
+
+        .blob-blue {
+            width: 65vw;
+            height: 65vw;
+            background: #0d235c; /* Deep Blue */
+            bottom: -20%;
+            right: -10%;
+            animation-delay: -5s;
+        }
+
+        .blob-accent {
+            width: 40vw;
+            height: 40vw;
+            background: #e62429; /* Brighter Red accent */
+            top: 40%;
+            left: 30%;
+            opacity: 0.3;
+            animation-delay: -12s;
+            animation-duration: 30s;
+        }
+
+        @keyframes floatBlob {
+            0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+            33% { transform: translate(15%, 10%) scale(1.1) rotate(45deg); }
+            66% { transform: translate(-10%, 20%) scale(0.9) rotate(-20deg); }
+            100% { transform: translate(20%, -10%) scale(1.05) rotate(90deg); }
+        }
+
+        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-track { background: #030508; }
         ::-webkit-scrollbar-thumb { 
             background: linear-gradient(to bottom, #2563eb, #e62429); 
             border-radius: 4px; 
@@ -63,17 +109,63 @@
         /* Glassmorphism Cards */
         .glass-card {
             background: var(--spider-panel);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(37, 99, 235, 0.2);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--spider-border);
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         .glass-card:hover {
-            transform: translateY(-5px) scale(1.01);
+            border-color: rgba(37, 99, 235, 0.6);
+            box-shadow: 0 10px 30px -10px rgba(37, 99, 235, 0.2);
+        }
+
+        /* --- Click-to-Expand CSS Grid Magic --- */
+        .expandable-card {
+            cursor: pointer;
+        }
+        
+        .expandable-card:hover .expand-icon {
+            color: #e62429;
+        }
+
+        .rule-details-container {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.4s ease-in-out;
+        }
+
+        .rule-details-inner {
+            overflow: hidden;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        /* When the card is expanded via JavaScript class */
+        .expandable-card.expanded {
             border-color: rgba(230, 36, 41, 0.6);
-            box-shadow: 0 10px 30px -10px rgba(230, 36, 41, 0.4), 
-                        0 0 20px -5px rgba(37, 99, 235, 0.4);
+            box-shadow: 0 10px 40px -10px rgba(230, 36, 41, 0.3), 
+                        0 0 20px -5px rgba(37, 99, 235, 0.3);
+            transform: scale(1.01);
+            z-index: 20;
+        }
+
+        .expandable-card.expanded .rule-details-container {
+            grid-template-rows: 1fr;
+        }
+
+        .expandable-card.expanded .rule-details-inner {
+            opacity: 1;
+            padding-top: 1rem; /* Add spacing only when open */
+        }
+
+        .expandable-card.expanded .expand-icon {
+            transform: rotate(180deg);
+            color: #e62429;
+        }
+
+        .expand-icon {
+            transition: transform 0.4s ease, color 0.3s ease;
         }
 
         /* Text Gradients */
@@ -87,22 +179,17 @@
         @keyframes target-pulse {
             0% { box-shadow: 0 0 0 0 rgba(230, 36, 41, 0.7); border-color: #e62429; }
             70% { box-shadow: 0 0 0 15px rgba(230, 36, 41, 0); border-color: #2563eb; }
-            100% { box-shadow: 0 0 0 0 rgba(230, 36, 41, 0); border-color: rgba(37, 99, 235, 0.2); }
+            100% { box-shadow: 0 0 0 0 rgba(230, 36, 41, 0); border-color: var(--spider-border); }
         }
         
         .targeted {
             animation: target-pulse 2s infinite;
             border-left: 4px solid #e62429 !important;
-            transform: scale(1.02);
-            z-index: 10;
+            z-index: 30;
         }
-
-        /* Expandable Details Smoothness */
-        details > summary { list-style: none; }
-        details > summary::-webkit-details-marker { display: none; }
         
         .nav-btn.active {
-            background: linear-gradient(135deg, #991b1b, #e62429);
+            background: linear-gradient(135deg, #880e15, #e62429);
             border-color: #e62429;
             color: white;
             box-shadow: 0 0 15px rgba(230, 36, 41, 0.4);
@@ -111,8 +198,11 @@
 </head>
 <body class="font-sans antialiased min-h-screen pb-20">
 
-    <!-- The Animated Web Background -->
-    <canvas id="webCanvas"></canvas>
+    <div class="liquid-bg">
+        <div class="liquid-blob blob-red"></div>
+        <div class="liquid-blob blob-blue"></div>
+        <div class="liquid-blob blob-accent"></div>
+    </div>
 
     <header class="sticky top-0 z-50 glass-card border-b-0 border-spider-blue/30 shadow-[0_4px_30px_rgba(0,0,0,0.5)]">
         <div class="max-w-6xl mx-auto px-4 py-5">
@@ -151,51 +241,99 @@
             <div class="mb-8 flex items-end gap-4 border-b border-spider-border/50 pb-4">
                 <h2 class="text-4xl font-display font-bold text-white"><span class="text-spider-red">01.</span> Chat Rules</h2>
             </div>
+            
+            <p class="text-spider-text mb-6 italic">We want everyone to enjoy themselves and feel welcome here. Please abide by these rules. <strong class="text-spider-blue">Tap a card to read the full details.</strong></p>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="info-card glass-card rounded-xl p-6 relative border-l-4 border-l-spider-blue hover:border-l-spider-red" id="article-1">
-                    <div class="flex justify-between items-start mb-4">
-                        <h3 class="text-xl font-bold text-white font-display">Article 1: Civil Behaviour</h3>
-                        <button onclick="copyLink('article-1', this)" class="text-xs bg-black hover:bg-spider-red text-spider-text hover:text-white px-3 py-1.5 rounded transition border border-spider-border">🔗 Sniper Link</button>
+            <div class="grid grid-cols-1 gap-4">
+                
+                <!-- Chat Article 1 -->
+                <div class="info-card glass-card expandable-card rounded-xl p-6 relative border-l-4 border-l-spider-blue" id="chat-civil" onclick="toggleCard(this)">
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center gap-4">
+                            <span class="text-2xl">🗣️</span>
+                            <div>
+                                <h3 class="text-xl font-bold text-white font-display">Article 1: Civil Behaviour</h3>
+                                <p class="text-sm text-gray-400 mt-1">No spamming, no inappropriate names, and respect privacy.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <button onclick="copyLink('chat-civil', this, event)" class="text-xs bg-black hover:bg-spider-red text-spider-text hover:text-white px-3 py-1.5 rounded transition border border-spider-border">🔗 Snipe</button>
+                            <span class="text-gray-500 expand-icon font-bold text-xl">▼</span>
+                        </div>
                     </div>
-                    <ul class="space-y-3 text-sm text-gray-300">
-                        <li><strong class="text-spider-blue">1.1</strong> Avoid bombarding the chat with too many emojis, repeated messages, or level-up attempts.</li>
-                        <li><strong class="text-spider-blue">1.2</strong> Don't post links anywhere on the server or promote yourself or others.</li>
-                        <li><strong class="text-spider-blue">1.3</strong> Greet and engage new members. Avoid being impolite, eerie, or violent. Use correct display names.</li>
-                        <li><strong class="text-spider-blue">1.4</strong> Show respect for staff. No offensive names/PFPs (staff may alter them at any time).</li>
-                        <li><strong class="text-spider-blue">1.5</strong> Never share someone else's pictures or personal info without consent.</li>
-                    </ul>
-                    <details class="mt-5 bg-black/40 p-3 rounded-lg cursor-pointer group border border-spider-border/50 hover:border-spider-red transition">
-                        <summary class="text-spider-text font-semibold outline-none group-open:text-spider-red transition flex justify-between items-center text-sm">
-                            <span>Edge Case: "I was just joking around!"</span>
-                            <span class="text-xs">▼</span>
-                        </summary>
-                        <p class="text-gray-400 text-xs mt-3 border-l-2 border-spider-red pl-3">Intent does not matter if the behavior disrupts the chat or makes others uncomfortable. Staff discretion applies 100% of the time.</p>
-                    </details>
+                    
+                    <div class="rule-details-container">
+                        <div class="rule-details-inner">
+                            <div class="border-t border-spider-border/30 mt-2 pt-4">
+                                <ul class="space-y-4 text-sm text-gray-300">
+                                    <li class="flex gap-3"><strong class="text-spider-blue shrink-0">1.1</strong> <p>Avoid bombarding the chat with too many emojis, repeated messages, or level-up attempts.</p></li>
+                                    <li class="flex gap-3"><strong class="text-spider-blue shrink-0">1.2</strong> <p>Don't post links anywhere on the server or promote yourself or others.</p></li>
+                                    <li class="flex gap-3"><strong class="text-spider-blue shrink-0">1.3</strong> <p>Greet and engage new members in discussions. Avoid being impolite, eerie, or violent. Don't give members nicknames; instead, use their correct display name.</p></li>
+                                    <li class="flex gap-3"><strong class="text-spider-blue shrink-0">1.4</strong> <p>Pay attention to and show respect for the staff members. Please refrain from using offensive names or profile pictures, as staff members have the right to alter them at any time.</p></li>
+                                    <li class="flex gap-3"><strong class="text-spider-blue shrink-0">1.5</strong> <p>Never share someone else's pictures or personal information without that person's consent. Also, share your own personal information at your own risk.</p></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="info-card glass-card rounded-xl p-6 relative border-l-4 border-l-spider-blue hover:border-l-spider-red" id="article-2">
-                    <div class="flex justify-between items-start mb-4">
-                        <h3 class="text-xl font-bold text-white font-display">Article 2: Following Instructions</h3>
-                        <button onclick="copyLink('article-2', this)" class="text-xs bg-black hover:bg-spider-red text-spider-text hover:text-white px-3 py-1.5 rounded transition border border-spider-border">🔗 Sniper Link</button>
+                <!-- Chat Article 2 -->
+                <div class="info-card glass-card expandable-card rounded-xl p-6 relative border-l-4 border-l-spider-blue" id="chat-instruct" onclick="toggleCard(this)">
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center gap-4">
+                            <span class="text-2xl">🛡️</span>
+                            <div>
+                                <h3 class="text-xl font-bold text-white font-display">Article 2: Following Instructions</h3>
+                                <p class="text-sm text-gray-400 mt-1">Listen to staff, avoid arguing, and don't abuse pings.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <button onclick="copyLink('chat-instruct', this, event)" class="text-xs bg-black hover:bg-spider-red text-spider-text hover:text-white px-3 py-1.5 rounded transition border border-spider-border">🔗 Snipe</button>
+                            <span class="text-gray-500 expand-icon font-bold text-xl">▼</span>
+                        </div>
                     </div>
-                    <ul class="space-y-3 text-sm text-gray-300">
-                        <li><strong class="text-spider-blue">2.1</strong> You must change the topic if a staff member requests it. Noncompliance leads to kick/ban.</li>
-                        <li><strong class="text-spider-blue">2.2</strong> Avoid tagging staff members unless it's for a significant occasion.</li>
-                        <li><strong class="text-spider-blue">2.3</strong> Avoid arguing with moderators or staff. Their choices are final.</li>
-                    </ul>
+                    
+                    <div class="rule-details-container">
+                        <div class="rule-details-inner">
+                            <div class="border-t border-spider-border/30 mt-2 pt-4">
+                                <ul class="space-y-4 text-sm text-gray-300">
+                                    <li class="flex gap-3"><strong class="text-spider-blue shrink-0">2.1</strong> <p>You must change the topic if a staff member requests it. A kick or ban may be imposed for noncompliance.</p></li>
+                                    <li class="flex gap-3"><strong class="text-spider-blue shrink-0">2.2</strong> <p>Avoid tagging staff members unless it's for a significant occasion.</p></li>
+                                    <li class="flex gap-3"><strong class="text-spider-blue shrink-0">2.3</strong> <p>Avoid arguing with moderators or staff. Their choices are final.</p></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="info-card glass-card rounded-xl p-6 relative border-l-4 border-l-spider-blue hover:border-l-spider-red" id="article-3">
-                    <div class="flex justify-between items-start mb-4">
-                        <h3 class="text-xl font-bold text-white font-display">Article 3: Conflict Resolution</h3>
-                        <button onclick="copyLink('article-3', this)" class="text-xs bg-black hover:bg-spider-red text-spider-text hover:text-white px-3 py-1.5 rounded transition border border-spider-border">🔗 Sniper Link</button>
+                <!-- Chat Article 3 -->
+                <div class="info-card glass-card expandable-card rounded-xl p-6 relative border-l-4 border-l-spider-blue" id="chat-conflict" onclick="toggleCard(this)">
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center gap-4">
+                            <span class="text-2xl">🤝</span>
+                            <div>
+                                <h3 class="text-xl font-bold text-white font-display">Article 3: Conflict Resolution</h3>
+                                <p class="text-sm text-gray-400 mt-1">Use the block button and possess common sense.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <button onclick="copyLink('chat-conflict', this, event)" class="text-xs bg-black hover:bg-spider-red text-spider-text hover:text-white px-3 py-1.5 rounded transition border border-spider-border">🔗 Snipe</button>
+                            <span class="text-gray-500 expand-icon font-bold text-xl">▼</span>
+                        </div>
                     </div>
-                    <ul class="space-y-3 text-sm text-gray-300">
-                        <li><strong class="text-spider-blue">3.1</strong> Blocking and moving on is the best course of action when someone is bothering you.</li>
-                        <li><strong class="text-spider-blue">3.2</strong> It is assumed that you possess the common sense to recognise sarcasm and puns. Don't weaponize reports over jokes.</li>
-                    </ul>
+                    
+                    <div class="rule-details-container">
+                        <div class="rule-details-inner">
+                            <div class="border-t border-spider-border/30 mt-2 pt-4">
+                                <ul class="space-y-4 text-sm text-gray-300">
+                                    <li class="flex gap-3"><strong class="text-spider-blue shrink-0">3.1</strong> <p>Blocking and moving on is the best course of action when someone is bothering you.</p></li>
+                                    <li class="flex gap-3"><strong class="text-spider-blue shrink-0">3.2</strong> <p>It is assumed that you possess the common sense to recognise sarcasm and puns.</p></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+
             </div>
         </section>
 
@@ -206,82 +344,149 @@
             
             <div class="mb-6 bg-spider-red/10 border border-spider-red/30 p-4 rounded-lg flex gap-3 items-center">
                 <span class="text-2xl">⚠️</span>
-                <p class="text-sm text-spider-text font-medium"><strong class="text-white">The spirit of the rule is more important than its exact wording.</strong> Moderators have the last word. Pushing the boundaries of rules on purpose will result in action.</p>
+                <p class="text-sm text-spider-text font-medium"><strong class="text-white">The spirit of the rule is more important than its exact wording.</strong> Moderators have the last word. Pushing the boundaries on purpose will result in a warning for toxic attitudes.</p>
             </div>
 
-            <div class="grid grid-cols-1 gap-5">
-                <div class="info-card glass-card rounded-xl p-5 flex flex-col md:flex-row gap-5 items-center" id="rule-1">
-                    <div class="flex-shrink-0 text-5xl font-display font-black text-transparent bg-clip-text bg-gradient-to-b from-spider-border to-transparent opacity-50 pl-2">01</div>
-                    <div class="flex-grow w-full">
-                        <div class="flex justify-between items-start">
-                            <h3 class="text-lg font-bold text-white">Follow Discord Terms of Service</h3>
-                            <button onclick="copyLink('rule-1', this)" class="text-xs bg-black text-spider-text hover:text-white hover:bg-spider-red px-2 py-1 rounded transition border border-spider-border">🔗 Snipe</button>
+            <div class="grid grid-cols-1 gap-4">
+                
+                <div class="info-card glass-card expandable-card rounded-xl p-5" id="rule-1" onclick="toggleCard(this)">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div class="flex gap-4 items-center">
+                            <div class="flex-shrink-0 text-4xl font-display font-black text-transparent bg-clip-text bg-gradient-to-b from-spider-border to-transparent opacity-60 w-12 text-center">1</div>
+                            <div>
+                                <h3 class="text-lg font-bold text-white">Follow Discord Terms of Service</h3>
+                                <p class="text-sm text-gray-400 mt-1">Abide by Discord guidelines. Violations lead to severe action.</p>
+                            </div>
                         </div>
-                        <p class="text-sm text-gray-300 mt-1">Abide by Discord guidelines. Violation can result in severe action, including permanent removal.</p>
+                        <div class="flex items-center gap-3 md:ml-auto">
+                            <button onclick="copyLink('rule-1', this, event)" class="text-xs bg-black text-spider-text hover:text-white hover:bg-spider-red px-3 py-1.5 rounded transition border border-spider-border">🔗 Snipe</button>
+                            <span class="text-gray-500 expand-icon font-bold text-xl">▼</span>
+                        </div>
+                    </div>
+                    <div class="rule-details-container">
+                        <div class="rule-details-inner">
+                            <div class="mt-2 pt-4 border-t border-spider-border/30">
+                                <p class="text-sm text-gray-300">Please abide by the rules and policies set out in <a href="https://discord.com/guidelines" class="text-spider-blue hover:underline">Discord Guidelines</a> and <a href="https://discord.com/terms" class="text-spider-blue hover:underline">Terms of Service</a>. Depending on the violation of these terms, action taken can be as severe as removal from the server.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="info-card glass-card rounded-xl p-5 flex flex-col md:flex-row gap-5 items-center" id="rule-2">
-                    <div class="flex-shrink-0 text-5xl font-display font-black text-transparent bg-clip-text bg-gradient-to-b from-spider-border to-transparent opacity-50 pl-2">02</div>
-                    <div class="flex-grow w-full">
-                        <div class="flex justify-between items-start">
-                            <h3 class="text-lg font-bold text-white">Appropriate Content</h3>
-                            <button onclick="copyLink('rule-2', this)" class="text-xs bg-black text-spider-text hover:text-white hover:bg-spider-red px-2 py-1 rounded transition border border-spider-border">🔗 Snipe</button>
+                <div class="info-card glass-card expandable-card rounded-xl p-5" id="rule-2" onclick="toggleCard(this)">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div class="flex gap-4 items-center">
+                            <div class="flex-shrink-0 text-4xl font-display font-black text-transparent bg-clip-text bg-gradient-to-b from-spider-border to-transparent opacity-60 w-12 text-center">2</div>
+                            <div>
+                                <h3 class="text-lg font-bold text-white">Keep Content Appropriate</h3>
+                                <p class="text-sm text-gray-400 mt-1">No NSFW, extreme violence, or self-harm content.</p>
+                            </div>
                         </div>
-                        <p class="text-sm text-gray-300 mt-1">No NSFW content (extreme violence, self-harm, explicit sexual content). Discussion related to such content must not share explicit media.</p>
-                        <details class="mt-3 bg-black/40 p-2.5 rounded-lg cursor-pointer group text-xs border border-spider-border/50 hover:border-spider-red transition">
-                            <summary class="text-spider-text font-semibold outline-none group-open:text-spider-red flex justify-between items-center">
-                                <span>Edge Case: "It was just a meme/anime!"</span>
-                                <span>▼</span>
-                            </summary>
-                            <p class="text-gray-400 mt-2 border-l-2 border-spider-red pl-2">Drawn art, anime, or "joke" images that depict sexually explicit acts or extreme gore are heavily strictly prohibited. Context does not save you here.</p>
-                        </details>
+                        <div class="flex items-center gap-3 md:ml-auto">
+                            <button onclick="copyLink('rule-2', this, event)" class="text-xs bg-black text-spider-text hover:text-white hover:bg-spider-red px-3 py-1.5 rounded transition border border-spider-border">🔗 Snipe</button>
+                            <span class="text-gray-500 expand-icon font-bold text-xl">▼</span>
+                        </div>
+                    </div>
+                    <div class="rule-details-container">
+                        <div class="rule-details-inner">
+                            <div class="mt-2 pt-4 border-t border-spider-border/30">
+                                <p class="text-sm text-gray-300">Posting of NSFW content - defined as extreme violence, self-harm, and explicit sexual content - is strictly not allowed. Discussion related to such content should refrain from sharing explicit media. Violations are subject to staff judgment.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="info-card glass-card rounded-xl p-5 flex flex-col md:flex-row gap-5 items-center" id="rule-3">
-                    <div class="flex-shrink-0 text-5xl font-display font-black text-transparent bg-clip-text bg-gradient-to-b from-spider-border to-transparent opacity-50 pl-2">03</div>
-                    <div class="flex-grow w-full">
-                        <div class="flex justify-between items-start">
-                            <h3 class="text-lg font-bold text-white">Respect Server Staff</h3>
-                            <button onclick="copyLink('rule-3', this)" class="text-xs bg-black text-spider-text hover:text-white hover:bg-spider-red px-2 py-1 rounded transition border border-spider-border">🔗 Snipe</button>
+                <div class="info-card glass-card expandable-card rounded-xl p-5" id="rule-3" onclick="toggleCard(this)">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div class="flex gap-4 items-center">
+                            <div class="flex-shrink-0 text-4xl font-display font-black text-transparent bg-clip-text bg-gradient-to-b from-spider-border to-transparent opacity-60 w-12 text-center">3</div>
+                            <div>
+                                <h3 class="text-lg font-bold text-white">Respect Server Staff</h3>
+                                <p class="text-sm text-gray-400 mt-1">Address mod actions in tickets, not in public chat.</p>
+                            </div>
                         </div>
-                        <p class="text-sm text-gray-300 mt-1">Disruptive/aggressive behavior is not tolerated. Address mod actions in tickets, NOT in public channels. Evading punishments leads to instant bans.</p>
+                        <div class="flex items-center gap-3 md:ml-auto">
+                            <button onclick="copyLink('rule-3', this, event)" class="text-xs bg-black text-spider-text hover:text-white hover:bg-spider-red px-3 py-1.5 rounded transition border border-spider-border">🔗 Snipe</button>
+                            <span class="text-gray-500 expand-icon font-bold text-xl">▼</span>
+                        </div>
+                    </div>
+                    <div class="rule-details-container">
+                        <div class="rule-details-inner">
+                            <div class="mt-2 pt-4 border-t border-spider-border/30">
+                                <p class="text-sm text-gray-300">On this server, all members will be respectful and kind to each other. Any disruptive, aggressive, or disrespectful behavior, or any form of nuisance, will not be tolerated. Members are to follow directions from server staff and address any questions regarding mod actions in the appropriate channels (Tickets) and not in a public forum. Any attempts to circumvent punishments enacted by server staff can result in removal from the server.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="info-card glass-card rounded-xl p-5 flex flex-col md:flex-row gap-5 items-center" id="rule-4">
-                    <div class="flex-shrink-0 text-5xl font-display font-black text-transparent bg-clip-text bg-gradient-to-b from-spider-border to-transparent opacity-50 pl-2">04</div>
-                    <div class="flex-grow w-full">
-                        <div class="flex justify-between items-start">
-                            <h3 class="text-lg font-bold text-white">Speak Hinglish</h3>
-                            <button onclick="copyLink('rule-4', this)" class="text-xs bg-black text-spider-text hover:text-white hover:bg-spider-red px-2 py-1 rounded transition border border-spider-border">🔗 Snipe</button>
+                <div class="info-card glass-card expandable-card rounded-xl p-5" id="rule-4" onclick="toggleCard(this)">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div class="flex gap-4 items-center">
+                            <div class="flex-shrink-0 text-4xl font-display font-black text-transparent bg-clip-text bg-gradient-to-b from-spider-border to-transparent opacity-60 w-12 text-center">4</div>
+                            <div>
+                                <h3 class="text-lg font-bold text-white">Speak Hinglish</h3>
+                                <p class="text-sm text-gray-400 mt-1">Official language is Hinglish (scriptures in English).</p>
+                            </div>
                         </div>
-                        <p class="text-sm text-gray-300 mt-1">Official language is Hinglish (scriptures in English) so everyone understands. Read channel pins as some channels have specific exemptions/rules.</p>
+                        <div class="flex items-center gap-3 md:ml-auto">
+                            <button onclick="copyLink('rule-4', this, event)" class="text-xs bg-black text-spider-text hover:text-white hover:bg-spider-red px-3 py-1.5 rounded transition border border-spider-border">🔗 Snipe</button>
+                            <span class="text-gray-500 expand-icon font-bold text-xl">▼</span>
+                        </div>
+                    </div>
+                    <div class="rule-details-container">
+                        <div class="rule-details-inner">
+                            <div class="mt-2 pt-4 border-t border-spider-border/30">
+                                <p class="text-sm text-gray-300">The official language of the server is Hinglish and scriptures followed are English. Please have conversations with other users of the server in this language because this allows everyone to understand each other best. Some channels may have channel-specific rules that add, modify, or exempt rules within a channel. Please read channel descriptions and pins.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="info-card glass-card rounded-xl p-5 flex flex-col md:flex-row gap-5 items-center" id="rule-5">
-                    <div class="flex-shrink-0 text-5xl font-display font-black text-transparent bg-clip-text bg-gradient-to-b from-spider-border to-transparent opacity-50 pl-2">05</div>
-                    <div class="flex-grow w-full">
-                        <div class="flex justify-between items-start">
-                            <h3 class="text-lg font-bold text-white">No Spam or Advertising</h3>
-                            <button onclick="copyLink('rule-5', this)" class="text-xs bg-black text-spider-text hover:text-white hover:bg-spider-red px-2 py-1 rounded transition border border-spider-border">🔗 Snipe</button>
+                <div class="info-card glass-card expandable-card rounded-xl p-5" id="rule-5" onclick="toggleCard(this)">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div class="flex gap-4 items-center">
+                            <div class="flex-shrink-0 text-4xl font-display font-black text-transparent bg-clip-text bg-gradient-to-b from-spider-border to-transparent opacity-60 w-12 text-center">5</div>
+                            <div>
+                                <h3 class="text-lg font-bold text-white">No Spam or Advertising</h3>
+                                <p class="text-sm text-gray-400 mt-1">No disruptive self-promo or spreading scams.</p>
+                            </div>
                         </div>
-                        <p class="text-sm text-gray-300 mt-1">No disruptive self-promotion, duplicate messages, or wall-texts. Selling server growth methods or posting scams results in an instant ban.</p>
+                        <div class="flex items-center gap-3 md:ml-auto">
+                            <button onclick="copyLink('rule-5', this, event)" class="text-xs bg-black text-spider-text hover:text-white hover:bg-spider-red px-3 py-1.5 rounded transition border border-spider-border">🔗 Snipe</button>
+                            <span class="text-gray-500 expand-icon font-bold text-xl">▼</span>
+                        </div>
+                    </div>
+                    <div class="rule-details-container">
+                        <div class="rule-details-inner">
+                            <div class="mt-2 pt-4 border-t border-spider-border/30">
+                                <p class="text-sm text-gray-300">It is prohibited to self-promote disruptively, spam the channel with duplicate messages, or to use images, links, emojis, or mentions in an excessive manner. Selling methods for server growth is strictly not allowed, nor is the spreading of harmful links or scams. Any acts breaking these rules result in instant removal.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="info-card glass-card expandable-card rounded-xl p-5" id="rule-8" onclick="toggleCard(this)">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div class="flex gap-4 items-center">
+                            <div class="flex-shrink-0 text-4xl font-display font-black text-transparent bg-clip-text bg-gradient-to-b from-spider-border to-transparent opacity-60 w-12 text-center">8</div>
+                            <div>
+                                <h3 class="text-lg font-bold text-white">No Offensive Content or Hate Speech</h3>
+                                <p class="text-sm text-gray-400 mt-1">Discrimination, hate speech, and politics are forbidden.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 md:ml-auto">
+                            <button onclick="copyLink('rule-8', this, event)" class="text-xs bg-black text-spider-text hover:text-white hover:bg-spider-red px-3 py-1.5 rounded transition border border-spider-border">🔗 Snipe</button>
+                            <span class="text-gray-500 expand-icon font-bold text-xl">▼</span>
+                        </div>
+                    </div>
+                    <div class="rule-details-container">
+                        <div class="rule-details-inner">
+                            <div class="mt-2 pt-4 border-t border-spider-border/30">
+                                <p class="text-sm text-gray-300">Discrimination, hate speech, or discussions on sensitive topics like politics, religion, violence, or regulated goods are strictly forbidden.<br><br>Beware of unexpected DMs on Discord. If you receive suspicious links or QR codes, report them to the mod team immediately with screenshots.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="info-card glass-card rounded-xl p-5 flex flex-col md:flex-row gap-5 items-center" id="rule-8">
-                    <div class="flex-shrink-0 text-5xl font-display font-black text-transparent bg-clip-text bg-gradient-to-b from-spider-border to-transparent opacity-50 pl-2">08</div>
-                    <div class="flex-grow w-full">
-                        <div class="flex justify-between items-start">
-                            <h3 class="text-lg font-bold text-white">No Hate Speech or Sensitive Topics</h3>
-                            <button onclick="copyLink('rule-8', this)" class="text-xs bg-black text-spider-text hover:text-white hover:bg-spider-red px-2 py-1 rounded transition border border-spider-border">🔗 Snipe</button>
-                        </div>
-                        <p class="text-sm text-gray-300 mt-1">Discrimination, hate speech, or debates on politics, religion, violence, or regulated goods are forbidden. Report suspicious DMs to staff immediately.</p>
-                    </div>
-                </div>
             </div>
         </section>
 
@@ -330,6 +535,18 @@
                     <h3 class="text-xl font-display font-bold text-white">VC Department</h3>
                     <p class="text-sm text-gray-300 mt-2">Dedicated to managing voice channels, making sure voice chats stay friendly and organized.</p>
                 </div>
+                
+                <div class="info-card glass-card rounded-xl p-6 text-center group" id="role-ticket-mgr">
+                    <div class="text-5xl mb-3">🎟️</div>
+                    <h3 class="text-xl font-display font-bold text-white">Ticket Manager</h3>
+                    <p class="text-sm text-gray-300 mt-2">Handles the ticket system, making sure member issues and requests are resolved quickly.</p>
+                </div>
+                
+                <div class="info-card glass-card rounded-xl p-6 text-center group sm:col-span-2 lg:col-span-2" id="role-ticket-dept">
+                    <div class="text-5xl mb-3">🎫</div>
+                    <h3 class="text-xl font-display font-bold text-white">Ticket Department</h3>
+                    <p class="text-sm text-gray-300 mt-2">A team dedicated to working together on tickets, providing support to the community whenever needed.</p>
+                </div>
 
             </div>
         </section>
@@ -342,18 +559,19 @@
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div class="info-card glass-card rounded-xl p-5" id="spec-bff"><div class="font-bold text-white text-lg">🤝 Best Friends</div><div class="text-xs text-gray-400 mt-2">Senpai's closest companions.</div></div>
                 <div class="info-card glass-card rounded-xl p-5" id="spec-apex"><div class="font-bold text-yellow-400 text-lg">🏆 Apex Spiders</div><div class="text-xs text-gray-400 mt-2">Great achievers of the last year.</div></div>
+                <div class="info-card glass-card rounded-xl p-5" id="spec-partner"><div class="font-bold text-blue-400 text-lg">🤖 Partnered Bots</div><div class="text-xs text-gray-400 mt-2">Officially partnered with us.</div></div>
                 <div class="info-card glass-card rounded-xl p-5" id="spec-guest"><div class="font-bold text-white text-lg">🎫 Server Guest</div><div class="text-xs text-gray-400 mt-2">Respected visitors with limited access.</div></div>
                 <div class="info-card glass-card rounded-xl p-5" id="spec-memer"><div class="font-bold text-green-400 text-lg">🤡 Memer</div><div class="text-xs text-gray-400 mt-2">Active meme posters.</div></div>
                 <div class="info-card glass-card rounded-xl p-5" id="spec-artist"><div class="font-bold text-pink-400 text-lg">🎨 Artist</div><div class="text-xs text-gray-400 mt-2">Creators in Art Works.</div></div>
                 <div class="info-card glass-card rounded-xl p-5" id="spec-writer"><div class="font-bold text-purple-400 text-lg">✍️ Writers</div><div class="text-xs text-gray-400 mt-2">Poets and storytellers.</div></div>
-                <div class="info-card glass-card rounded-xl p-5 col-span-2" id="spec-female"><div class="font-bold text-rose-300 text-lg">🌸 Verified Female</div><div class="text-xs text-gray-400 mt-2">Trusted verified members of the community.</div></div>
+                <div class="info-card glass-card rounded-xl p-5" id="spec-female"><div class="font-bold text-rose-300 text-lg">🌸 Verified Female</div><div class="text-xs text-gray-400 mt-2">Trusted verified community members.</div></div>
                 
                 <div class="info-card glass-card border border-[#ff73fa]/50 shadow-[0_0_20px_rgba(255,115,250,0.15)] rounded-xl p-6 col-span-2 md:col-span-4 flex flex-col md:flex-row items-center justify-between gap-4" id="spec-crystal">
                     <div>
                         <div class="font-display font-bold text-[#ff73fa] text-2xl">💎 Crystals (Boosters)</div>
                         <div class="text-sm text-gray-300 mt-2 max-w-2xl">Supporters who boost the server. Gain higher-level perks and exclusive channels where SenpaiSpider is active.</div>
                     </div>
-                    <button onclick="copyLink('spec-crystal', this)" class="text-xs bg-black text-spider-text hover:text-white px-4 py-2 rounded-lg border border-spider-border transition whitespace-nowrap">🔗 Snipe Link</button>
+                    <button onclick="copyLink('spec-crystal', this, event)" class="text-xs bg-black text-spider-text hover:text-white px-4 py-2 rounded-lg border border-spider-border transition whitespace-nowrap">🔗 Snipe Link</button>
                 </div>
             </div>
         </section>
@@ -364,24 +582,28 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                <div class="info-card glass-card rounded-xl p-4 flex items-center gap-4 group" id="lvl-5">
+                    <div class="w-14 h-14 rounded-lg bg-black border border-spider-border flex items-center justify-center font-display font-black text-2xl text-gray-400 transition">5</div>
+                    <div class="text-sm text-gray-300">First step after beginner.</div>
+                </div>
                 <div class="info-card glass-card rounded-xl p-4 flex items-center gap-4 group" id="lvl-10">
-                    <div class="w-14 h-14 rounded-lg bg-black border border-spider-border flex items-center justify-center font-display font-black text-2xl text-gray-300 group-hover:border-white transition">10</div>
-                    <div class="text-sm text-gray-300">Change your nickname.</div>
+                    <div class="w-14 h-14 rounded-lg bg-black border border-spider-border flex items-center justify-center font-display font-black text-2xl text-gray-300 transition">10</div>
+                    <div class="text-sm text-gray-300">Ability to change nickname.</div>
                 </div>
                 <div class="info-card glass-card rounded-xl p-4 flex items-center gap-4 group" id="lvl-20">
-                    <div class="w-14 h-14 rounded-lg bg-black border border-spider-border flex items-center justify-center font-display font-black text-2xl text-blue-400 group-hover:border-blue-400 transition">20</div>
-                    <div class="text-sm text-gray-300">External emojis + Screen share/Cam.</div>
+                    <div class="w-14 h-14 rounded-lg bg-black border border-spider-border flex items-center justify-center font-display font-black text-2xl text-blue-400 transition">20</div>
+                    <div class="text-sm text-gray-300">External emojis + Cam/Stream.</div>
                 </div>
                 <div class="info-card glass-card rounded-xl p-4 flex items-center gap-4 group" id="lvl-30">
-                    <div class="w-14 h-14 rounded-lg bg-black border border-spider-border flex items-center justify-center font-display font-black text-2xl text-green-400 group-hover:border-green-400 transition">30</div>
+                    <div class="w-14 h-14 rounded-lg bg-black border border-spider-border flex items-center justify-center font-display font-black text-2xl text-green-400 transition">30</div>
                     <div class="text-sm text-gray-300">GIFs & Soundboard access.</div>
                 </div>
                 <div class="info-card glass-card rounded-xl p-4 flex items-center gap-4 group" id="lvl-40">
-                    <div class="w-14 h-14 rounded-lg bg-black border border-spider-border flex items-center justify-center font-display font-black text-2xl text-yellow-400 group-hover:border-yellow-400 transition">40</div>
+                    <div class="w-14 h-14 rounded-lg bg-black border border-spider-border flex items-center justify-center font-display font-black text-2xl text-yellow-400 transition">40</div>
                     <div class="text-sm text-gray-300">Attach files & Rename custom VC.</div>
                 </div>
                 <div class="info-card glass-card rounded-xl p-4 flex items-center gap-4 group" id="lvl-50">
-                    <div class="w-14 h-14 rounded-lg bg-black border border-spider-border flex items-center justify-center font-display font-black text-2xl text-orange-400 group-hover:border-orange-400 transition">50</div>
+                    <div class="w-14 h-14 rounded-lg bg-black border border-spider-border flex items-center justify-center font-display font-black text-2xl text-orange-400 transition">50</div>
                     <div class="text-sm text-gray-300">Create threads & External stickers.</div>
                 </div>
 
@@ -391,11 +613,21 @@
                 </div>
                 
                 <div class="info-card glass-card rounded-xl p-4 flex items-center gap-4 group" id="lvl-70">
-                    <div class="w-14 h-14 rounded-lg bg-black border border-spider-border flex items-center justify-center font-display font-black text-2xl text-purple-400 group-hover:border-purple-400 transition">70</div>
+                    <div class="w-14 h-14 rounded-lg bg-black border border-spider-border flex items-center justify-center font-display font-black text-2xl text-purple-400 transition">70</div>
                     <div class="text-sm text-gray-300">Special CMDs & Ext. Soundboard.</div>
                 </div>
+                
+                <div class="info-card glass-card rounded-xl p-4 flex items-center gap-4 group" id="lvl-80">
+                    <div class="w-14 h-14 rounded-lg bg-black border border-spider-border flex items-center justify-center font-display font-black text-2xl text-rose-400 transition">80</div>
+                    <div class="text-sm text-gray-300">Special color roles & Threads.</div>
+                </div>
+                
+                <div class="info-card glass-card rounded-xl p-4 flex items-center gap-4 group" id="lvl-90">
+                    <div class="w-14 h-14 rounded-lg bg-black border border-spider-border flex items-center justify-center font-display font-black text-2xl text-teal-400 transition">90</div>
+                    <div class="text-sm text-gray-300">Special icon roles.</div>
+                </div>
 
-                <div class="info-card glass-card border border-spider-red/50 shadow-[0_0_20px_rgba(230,36,41,0.2)] rounded-xl p-5 flex flex-col sm:flex-row items-center gap-5 sm:col-span-2 lg:col-span-2 group hover:shadow-[0_0_30px_rgba(230,36,41,0.4)] transition" id="lvl-100">
+                <div class="info-card glass-card border border-spider-red/50 shadow-[0_0_20px_rgba(230,36,41,0.2)] rounded-xl p-5 flex flex-col sm:flex-row items-center gap-5 sm:col-span-2 group hover:shadow-[0_0_30px_rgba(230,36,41,0.4)] transition" id="lvl-100">
                     <div class="w-20 h-20 shrink-0 rounded-full bg-gradient-to-br from-spider-red to-spider-darkred flex items-center justify-center font-display font-black text-3xl text-white shadow-[0_0_15px_rgba(230,36,41,0.8)] border-2 border-black relative">
                         100
                         <div class="absolute inset-0 rounded-full border border-spider-red animate-ping opacity-20"></div>
@@ -403,7 +635,7 @@
                     <div class="text-center sm:text-left w-full">
                         <div class="flex flex-col sm:flex-row justify-between items-center sm:items-start gap-2 w-full">
                             <div class="font-display font-bold text-white text-xl">Maxed Out Role</div>
-                            <button onclick="copyLink('lvl-100', this)" class="text-xs bg-black text-spider-text hover:text-white hover:bg-spider-red px-3 py-1.5 rounded-lg border border-spider-border transition whitespace-nowrap">🔗 Snipe</button>
+                            <button onclick="copyLink('lvl-100', this, event)" class="text-xs bg-black text-spider-text hover:text-white hover:bg-spider-red px-3 py-1.5 rounded-lg border border-spider-border transition whitespace-nowrap">🔗 Snipe</button>
                         </div>
                         <div class="text-sm text-gray-300 mt-2">Custom auto react & Talkshow/Event priority. You've reached the very top of the server.</div>
                     </div>
@@ -414,6 +646,12 @@
     </main>
 
     <script>
+        // --- Click to Expand Logic ---
+        function toggleCard(cardElement) {
+            // Toggle the 'expanded' class which triggers CSS Grid animations
+            cardElement.classList.toggle('expanded');
+        }
+
         // Tab Navigation Logic
         function showCategory(categoryId, btnElement) {
             // Update button styles
@@ -421,12 +659,12 @@
                 btn.classList.remove('active');
                 btn.style.background = 'rgba(0,0,0,0.5)';
                 btn.style.color = '#cbd5e1';
-                btn.style.borderColor = 'rgba(37, 99, 235, 0.4)';
+                btn.style.borderColor = 'rgba(37, 99, 235, 0.3)';
             });
             
             if(btnElement) {
                 btnElement.classList.add('active');
-                btnElement.style.background = 'linear-gradient(135deg, #991b1b, #e62429)';
+                btnElement.style.background = 'linear-gradient(135deg, #880e15, #e62429)';
                 btnElement.style.color = 'white';
                 btnElement.style.borderColor = '#e62429';
             }
@@ -467,7 +705,8 @@
         }
 
         // Mod Sniper Link Logic
-        function copyLink(id, btnElement) {
+        function copyLink(id, btnElement, event) {
+            event.stopPropagation(); // Prevents the card from expanding when clicking the button
             const url = window.location.href.split('#')[0] + '#' + id;
             navigator.clipboard.writeText(url).then(() => {
                 const originalText = btnElement.innerText;
@@ -491,13 +730,18 @@
                 
                 if (targetElement) {
                     const parentSection = targetElement.closest('.category-section');
-                    // Find the button associated with this section (hacky but works for this structure)
                     const btnId = parentSection.id;
                     const buttons = document.querySelectorAll('.nav-btn');
                     let targetBtn = buttons[0]; // default to 'all'
                     buttons.forEach(b => { if(b.innerText.toLowerCase().includes(btnId.split('-')[0])) targetBtn = b; });
                     
                     showCategory(parentSection.id, targetBtn);
+                    
+                    // Automatically expand it if it's an expandable card
+                    if(targetElement.classList.contains('expandable-card')) {
+                        targetElement.classList.add('expanded');
+                    }
+                    
                     targetElement.classList.add('targeted');
                     
                     setTimeout(() => {
@@ -508,154 +752,10 @@
                     setTimeout(() => { targetElement.classList.remove('targeted'); }, 6000);
                 }
             }
-            // Initialize canvas animation
-            initCanvas();
         };
-
-        // --- Interactive Spider Web Canvas Animation ---
-        function initCanvas() {
-            const canvas = document.getElementById('webCanvas');
-            const ctx = canvas.getContext('2d');
-            
-            // Set canvas to full window
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            
-            let particlesArray = [];
-            
-            // Mouse interaction
-            let mouse = {
-                x: null,
-                y: null,
-                radius: (canvas.height/8) * (canvas.width/8)
-            };
-            
-            window.addEventListener('mousemove', function(event) {
-                mouse.x = event.x;
-                mouse.y = event.y;
-            });
-            
-            window.addEventListener('mouseout', function() {
-                mouse.x = undefined;
-                mouse.y = undefined;
-            });
-
-            // Handle Resize
-            window.addEventListener('resize', function() {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-                mouse.radius = (canvas.height/8) * (canvas.width/8);
-                initParticles();
-            });
-
-            // Create Particle
-            class Particle {
-                constructor(x, y, directionX, directionY, size, color) {
-                    this.x = x;
-                    this.y = y;
-                    this.directionX = directionX;
-                    this.directionY = directionY;
-                    this.size = size;
-                    this.color = color;
-                }
-                
-                // Draw particle
-                draw() {
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
-                    ctx.fillStyle = this.color;
-                    ctx.fill();
-                }
-                
-                // Check position, mouse collision, move
-                update() {
-                    // Bounce off edges
-                    if (this.x > canvas.width || this.x < 0) { this.directionX = -this.directionX; }
-                    if (this.y > canvas.height || this.y < 0) { this.directionY = -this.directionY; }
-                    
-                    // Collision detection - mouse position / particle position
-                    let dx = mouse.x - this.x;
-                    let dy = mouse.y - this.y;
-                    let distance = Math.sqrt(dx*dx + dy*dy);
-                    
-                    if (distance < mouse.radius + this.size) {
-                        if (mouse.x < this.x && this.x < canvas.width - this.size * 10) { this.x += 1; }
-                        if (mouse.x > this.x && this.x > this.size * 10) { this.x -= 1; }
-                        if (mouse.y < this.y && this.y < canvas.height - this.size * 10) { this.y += 1; }
-                        if (mouse.y > this.y && this.y > this.size * 10) { this.y -= 1; }
-                    }
-                    
-                    // Move particle
-                    this.x += this.directionX;
-                    this.y += this.directionY;
-                    this.draw();
-                }
-            }
-
-            function initParticles() {
-                particlesArray = [];
-                // Number of particles depends on screen size
-                let numberOfParticles = (canvas.height * canvas.width) / 12000;
-                // Cap particles to prevent lag on huge screens
-                if (numberOfParticles > 150) numberOfParticles = 150;
-                
-                for (let i = 0; i < numberOfParticles; i++) {
-                    let size = (Math.random() * 2) + 1;
-                    let x = (Math.random() * ((innerWidth - size * 2) - (size * 2)) + size * 2);
-                    let y = (Math.random() * ((innerHeight - size * 2) - (size * 2)) + size * 2);
-                    let directionX = (Math.random() * 1) - 0.5;
-                    let directionY = (Math.random() * 1) - 0.5;
-                    // Mix of dark red and dark blue particles
-                    let color = Math.random() > 0.5 ? '#2563eb' : '#e62429'; 
-                    
-                    particlesArray.push(new Particle(x, y, directionX, directionY, size, color));
-                }
-            }
-
-            function connect() {
-                let opacityValue = 1;
-                for (let a = 0; a < particlesArray.length; a++) {
-                    for (let b = a; b < particlesArray.length; b++) {
-                        let distance = ((particlesArray[a].x - particlesArray[b].x) * (particlesArray[a].x - particlesArray[b].x))
-                                     + ((particlesArray[a].y - particlesArray[b].y) * (particlesArray[a].y - particlesArray[b].y));
-                        
-                        // If particles are close, draw a line
-                        if (distance < (canvas.width/7) * (canvas.height/7)) {
-                            opacityValue = 1 - (distance/15000);
-                            if(opacityValue < 0) opacityValue = 0;
-                            
-                            // Determine line color based on particles connecting
-                            let r = 37, g = 99, bl = 235; // Default Blue
-                            if (particlesArray[a].color === '#e62429' || particlesArray[b].color === '#e62429') {
-                                r = 230; g = 36; bl = 41; // Mix in Red
-                            }
-                            
-                            ctx.strokeStyle = `rgba(${r}, ${g}, ${bl}, ${opacityValue * 0.4})`;
-                            ctx.lineWidth = 1;
-                            ctx.beginPath();
-                            ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
-                            ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
-                            ctx.stroke();
-                        }
-                    }
-                }
-            }
-
-            function animate() {
-                requestAnimationFrame(animate);
-                ctx.clearRect(0, 0, innerWidth, innerHeight);
-                for (let i = 0; i < particlesArray.length; i++) {
-                    particlesArray[i].update();
-                }
-                connect();
-            }
-
-            initParticles();
-            animate();
-        }
     </script>
     <style>
-        /* Add a simple fade in animation for tab switching */
+        /* Fade in animation for tab switching */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
