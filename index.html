@@ -15,10 +15,9 @@
                     colors: {
                         spider: {
                             black: '#050507',
-                            panel: 'rgba(12, 14, 18, 0.65)', /* Frosted glass */
+                            panel: 'rgba(15, 17, 21, 0.75)', /* Darker frosted glass */
                             border: 'rgba(255, 255, 255, 0.05)',
                             red: '#e62429',
-                            darkred: '#880e15',
                             blue: '#2563eb',
                             text: '#9ca3af'
                         }
@@ -42,16 +41,16 @@
             min-height: 100vh;
         }
 
-        /* --- Symbiote Physics Canvas --- */
-        #symbiote-canvas {
+        /* Physics Canvas Background */
+        #web-canvas {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
             z-index: -1;
-            pointer-events: none; /* Allows clicking on the UI */
-            background: radial-gradient(circle at center, #0f1115 0%, #050507 100%);
+            pointer-events: none; /* Let clicks pass through to the UI */
+            background: radial-gradient(circle at center, #0a0b10 0%, #050507 100%);
         }
 
         /* Custom Scrollbar */
@@ -63,16 +62,15 @@
         /* Premium Glass Cards */
         .glass-card {
             background: var(--spider-panel);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             border: 1px solid var(--spider-border);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
             transition: all 0.3s ease;
         }
-
         .glass-card:hover {
             border-color: rgba(255, 255, 255, 0.1);
-            background: rgba(20, 22, 28, 0.8);
+            background: rgba(20, 22, 28, 0.9);
         }
 
         /* Metallic & Glowing Icons */
@@ -80,24 +78,28 @@
             background: linear-gradient(135deg, #ffffff 0%, #718096 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0px 2px 6px rgba(0,0,0,0.8));
+            filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.8));
         }
-        
         .icon-red {
             background: linear-gradient(135deg, #ff4d4d 0%, #a30000 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0px 0px 10px rgba(230, 36, 41, 0.4));
+            filter: drop-shadow(0px 0px 8px rgba(230, 36, 41, 0.5));
         }
-
         .icon-gold {
             background: linear-gradient(135deg, #ffd700 0%, #b8860b 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0px 0px 10px rgba(255, 215, 0, 0.3));
+            filter: drop-shadow(0px 0px 8px rgba(255, 215, 0, 0.4));
+        }
+        .icon-blue {
+            background: linear-gradient(135deg, #60a5fa 0%, #1d4ed8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0px 0px 8px rgba(37, 99, 235, 0.4));
         }
 
-        /* --- Click-to-Expand Logic --- */
+        /* Click-to-Expand Logic */
         .expandable-card { cursor: pointer; }
         .expandable-card:hover .expand-icon { color: #e62429; }
         .rule-details-container {
@@ -112,7 +114,7 @@
         }
         .expandable-card.expanded {
             border-color: rgba(230, 36, 41, 0.3);
-            background: rgba(20, 22, 28, 0.9);
+            background: rgba(25, 27, 33, 0.95);
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(230, 36, 41, 0.05);
         }
         .expandable-card.expanded .rule-details-container { grid-template-rows: 1fr; }
@@ -120,7 +122,7 @@
         .expandable-card.expanded .expand-icon { transform: rotate(180deg); color: #e62429; }
         .expand-icon { transition: transform 0.4s ease, color 0.3s ease; }
 
-        /* Highlight Animation for Sniper Links */
+        /* Highlight Animation for Mod Sniper Links */
         @keyframes target-pulse {
             0% { box-shadow: 0 0 0 0 rgba(230, 36, 41, 0.4); border-color: #e62429; }
             70% { box-shadow: 0 0 0 10px rgba(230, 36, 41, 0); border-color: rgba(255,255,255,0.1); }
@@ -129,7 +131,7 @@
         .targeted {
             animation: target-pulse 2s infinite;
             border-left: 3px solid #e62429 !important;
-            background: rgba(20, 22, 28, 0.95);
+            background: rgba(25, 27, 33, 0.95);
         }
         
         /* Nav Buttons */
@@ -144,16 +146,13 @@
 </head>
 <body class="font-sans antialiased pb-20">
 
-    <!-- Symbiote Tendril Physics Background -->
-    <canvas id="symbiote-canvas"></canvas>
+    <canvas id="web-canvas"></canvas>
 
-    <header class="sticky top-0 z-50 glass-card border-b border-t-0 border-x-0 border-white/5 rounded-none shadow-lg">
+    <header class="sticky top-0 z-50 glass-card border-b border-t-0 border-x-0 rounded-none shadow-lg">
         <div class="max-w-6xl mx-auto px-6 py-4">
             <div class="flex flex-col md:flex-row justify-between items-center gap-5">
                 <div class="flex items-center gap-4">
-                    <div class="text-4xl icon-red">
-                        <i class="fa-solid fa-spider"></i>
-                    </div>
+                    <div class="text-4xl icon-red"><i class="fa-solid fa-spider"></i></div>
                     <div>
                         <h1 class="text-2xl font-display font-bold tracking-tight uppercase text-white">Spider's Web</h1>
                         <p class="text-[10px] text-spider-text tracking-[0.2em] uppercase font-semibold">Official Directory</p>
@@ -187,11 +186,10 @@
             </div>
             
             <div class="grid grid-cols-1 gap-3">
-                
                 <div class="info-card glass-card expandable-card rounded-xl p-5 relative border-l-2 border-l-transparent hover:border-l-spider-red" id="chat-civil" onclick="toggleCard(this)">
                     <div class="flex justify-between items-center gap-4">
                         <div class="flex items-center gap-5">
-                            <div class="w-10 text-center text-2xl icon-premium"><i class="fa-solid fa-users-slash"></i></div>
+                            <div class="w-10 text-center text-2xl icon-premium"><i class="fa-solid fa-users"></i></div>
                             <div>
                                 <h3 class="text-lg font-bold text-white font-display">Article 1: Civil Behaviour</h3>
                                 <p class="text-xs text-spider-text mt-1">No spamming, no inappropriate names, and respect privacy.</p>
@@ -202,16 +200,15 @@
                             <i class="fa-solid fa-chevron-down text-gray-400 expand-icon"></i>
                         </div>
                     </div>
-                    
                     <div class="rule-details-container">
                         <div class="rule-details-inner">
                             <div class="border-t border-white/10 mt-4 pt-4">
                                 <ul class="space-y-3 text-sm text-gray-300">
                                     <li class="flex gap-3"><strong class="text-spider-red shrink-0">1.1</strong> <p>Avoid bombarding the chat with too many emojis, repeated messages, or level-up attempts.</p></li>
                                     <li class="flex gap-3"><strong class="text-spider-red shrink-0">1.2</strong> <p>Don't post links anywhere on the server or promote yourself or others.</p></li>
-                                    <li class="flex gap-3"><strong class="text-spider-red shrink-0">1.3</strong> <p>Greet and engage new members. Avoid being impolite, eerie, or violent. Use correct display names.</p></li>
-                                    <li class="flex gap-3"><strong class="text-spider-red shrink-0">1.4</strong> <p>Pay attention to and respect staff. Refrain from offensive names/PFPs; staff may alter them.</p></li>
-                                    <li class="flex gap-3"><strong class="text-spider-red shrink-0">1.5</strong> <p>Never share personal info or pictures without consent.</p></li>
+                                    <li class="flex gap-3"><strong class="text-spider-red shrink-0">1.3</strong> <p>Greet and engage new members in discussions. Avoid being impolite, eerie, or violent. Don't give members nicknames; use their correct display name.</p></li>
+                                    <li class="flex gap-3"><strong class="text-spider-red shrink-0">1.4</strong> <p>Pay attention to and show respect for staff. Refrain from offensive names/PFPs; staff may alter them.</p></li>
+                                    <li class="flex gap-3"><strong class="text-spider-red shrink-0">1.5</strong> <p>Never share someone else's pictures or personal info without consent.</p></li>
                                 </ul>
                             </div>
                         </div>
@@ -232,14 +229,13 @@
                             <i class="fa-solid fa-chevron-down text-gray-400 expand-icon"></i>
                         </div>
                     </div>
-                    
                     <div class="rule-details-container">
                         <div class="rule-details-inner">
                             <div class="border-t border-white/10 mt-4 pt-4">
                                 <ul class="space-y-3 text-sm text-gray-300">
-                                    <li class="flex gap-3"><strong class="text-spider-red shrink-0">2.1</strong> <p>You must change the topic if requested. Noncompliance may result in a kick/ban.</p></li>
+                                    <li class="flex gap-3"><strong class="text-spider-red shrink-0">2.1</strong> <p>You must change the topic if a staff member requests it. A kick/ban may be imposed for noncompliance.</p></li>
                                     <li class="flex gap-3"><strong class="text-spider-red shrink-0">2.2</strong> <p>Avoid tagging staff members unless it's for a significant occasion.</p></li>
-                                    <li class="flex gap-3"><strong class="text-spider-red shrink-0">2.3</strong> <p>Avoid arguing with moderators. Their choices are final.</p></li>
+                                    <li class="flex gap-3"><strong class="text-spider-red shrink-0">2.3</strong> <p>Avoid arguing with moderators or staff. Their choices are final.</p></li>
                                 </ul>
                             </div>
                         </div>
@@ -260,12 +256,11 @@
                             <i class="fa-solid fa-chevron-down text-gray-400 expand-icon"></i>
                         </div>
                     </div>
-                    
                     <div class="rule-details-container">
                         <div class="rule-details-inner">
                             <div class="border-t border-white/10 mt-4 pt-4">
                                 <ul class="space-y-3 text-sm text-gray-300">
-                                    <li class="flex gap-3"><strong class="text-spider-red shrink-0">3.1</strong> <p>Blocking and moving on is the best course of action when someone bothers you.</p></li>
+                                    <li class="flex gap-3"><strong class="text-spider-red shrink-0">3.1</strong> <p>Blocking and moving on is the best course of action when someone is bothering you.</p></li>
                                     <li class="flex gap-3"><strong class="text-spider-red shrink-0">3.2</strong> <p>It is assumed that you possess the common sense to recognise sarcasm and puns.</p></li>
                                 </ul>
                             </div>
@@ -280,12 +275,13 @@
                 <h2 class="text-3xl font-display font-bold text-white tracking-wide"><span class="text-spider-red mr-2">02.</span> Community Rules</h2>
             </div>
             
-            <div class="mb-6 bg-black/40 border-l-4 border-spider-red p-4 rounded-r-lg flex gap-4 items-center">
-                <i class="fa-solid fa-triangle-exclamation text-spider-red text-xl"></i>
-                <p class="text-xs text-spider-text"><strong class="text-white">The spirit of the rule is more important than its exact wording.</strong> Moderators have the last word. Pushing boundaries will result in warnings for toxic attitudes.</p>
+            <div class="mb-6 bg-[#0a0b10] border-l-4 border-spider-red p-4 rounded-r-lg flex gap-4 items-center">
+                <i class="fa-solid fa-scale-balanced text-spider-red text-xl"></i>
+                <p class="text-xs text-spider-text"><strong class="text-white">The spirit of the rule is more important than its exact wording.</strong> Moderators have the last word on all warnings and rule interpretations. Willfully pushing the bounds of a rule will receive a warning.</p>
             </div>
 
             <div class="grid grid-cols-1 gap-3">
+                <!-- Rules 1 to 10 -->
                 <div class="info-card glass-card expandable-card rounded-xl p-5" id="rule-1" onclick="toggleCard(this)">
                     <div class="flex justify-between items-center gap-4">
                         <div class="flex gap-5 items-center">
@@ -302,8 +298,8 @@
                     </div>
                     <div class="rule-details-container">
                         <div class="rule-details-inner">
-                            <div class="mt-4 pt-4 border-t border-white/10">
-                                <p class="text-sm text-gray-300">Please abide by the rules set out in Discord Guidelines and Terms of Service. Action taken can be as severe as removal from the server.</p>
+                            <div class="mt-4 pt-4 border-t border-white/10 text-sm text-gray-300">
+                                Please abide by the rules and policies set out in Discord Guidelines and Terms. Depending on the violation, action taken can be as severe as removal from the server.
                             </div>
                         </div>
                     </div>
@@ -314,7 +310,7 @@
                         <div class="flex gap-5 items-center">
                             <div class="w-8 text-2xl font-display font-bold text-white/20 text-center">2</div>
                             <div>
-                                <h3 class="text-base font-bold text-white">Keep Content Appropriate</h3>
+                                <h3 class="text-base font-bold text-white">Keep Content Appropriate for All Ages</h3>
                                 <p class="text-xs text-spider-text mt-1">No NSFW, extreme violence, or self-harm content.</p>
                             </div>
                         </div>
@@ -325,8 +321,8 @@
                     </div>
                     <div class="rule-details-container">
                         <div class="rule-details-inner">
-                            <div class="mt-4 pt-4 border-t border-white/10">
-                                <p class="text-sm text-gray-300">Posting of NSFW content (violence, self-harm, explicit sexual content) is strictly not allowed. Discussions should refrain from sharing explicit media.</p>
+                            <div class="mt-4 pt-4 border-t border-white/10 text-sm text-gray-300">
+                                Posting of NSFW content - defined as extreme violence, self-harm, and explicit sexual content - is strictly not allowed. Discussion related to such content should refrain from sharing explicit media. Violations are subject to staff judgment.
                             </div>
                         </div>
                     </div>
@@ -337,7 +333,7 @@
                         <div class="flex gap-5 items-center">
                             <div class="w-8 text-2xl font-display font-bold text-white/20 text-center">3</div>
                             <div>
-                                <h3 class="text-base font-bold text-white">Respect Staff & Members</h3>
+                                <h3 class="text-base font-bold text-white">Have a Good Attitude & Be Respectful</h3>
                                 <p class="text-xs text-spider-text mt-1">Address mod actions in tickets, not public chat.</p>
                             </div>
                         </div>
@@ -348,8 +344,31 @@
                     </div>
                     <div class="rule-details-container">
                         <div class="rule-details-inner">
-                            <div class="mt-4 pt-4 border-t border-white/10">
-                                <p class="text-sm text-gray-300">Any disruptive, aggressive, or disrespectful behavior is not tolerated. Follow directions and address questions in tickets. Circumventing punishments results in removal.</p>
+                            <div class="mt-4 pt-4 border-t border-white/10 text-sm text-gray-300">
+                                All members will be respectful and kind. Any disruptive, aggressive, or disrespectful behavior will not be tolerated. Follow directions from staff and address mod actions in tickets, not public forums. Circumventing punishments results in removal.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card glass-card expandable-card rounded-xl p-5" id="rule-4" onclick="toggleCard(this)">
+                    <div class="flex justify-between items-center gap-4">
+                        <div class="flex gap-5 items-center">
+                            <div class="w-8 text-2xl font-display font-bold text-white/20 text-center">4</div>
+                            <div>
+                                <h3 class="text-base font-bold text-white">Speak Hinglish & Follow Channel Rules</h3>
+                                <p class="text-xs text-spider-text mt-1">Keep conversations understandable for everyone.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4 shrink-0">
+                            <button onclick="copyLink('rule-4', this, event)" class="text-xs bg-[#0a0a0c] text-gray-400 hover:text-white hover:bg-spider-red px-3 py-1.5 rounded border border-white/10 transition"><i class="fa-solid fa-link mr-1"></i> Snipe</button>
+                            <i class="fa-solid fa-chevron-down text-gray-400 expand-icon"></i>
+                        </div>
+                    </div>
+                    <div class="rule-details-container">
+                        <div class="rule-details-inner">
+                            <div class="mt-4 pt-4 border-t border-white/10 text-sm text-gray-300">
+                                The official language is Hinglish and scriptures followed are English. Please converse in this language so everyone understands. Read channel descriptions and pins for specific rules or exemptions.
                             </div>
                         </div>
                     </div>
@@ -360,7 +379,7 @@
                         <div class="flex gap-5 items-center">
                             <div class="w-8 text-2xl font-display font-bold text-white/20 text-center">5</div>
                             <div>
-                                <h3 class="text-base font-bold text-white">No Spam or Advertising</h3>
+                                <h3 class="text-base font-bold text-white">Avoid Excessive Advertising and Spam</h3>
                                 <p class="text-xs text-spider-text mt-1">No disruptive self-promo or spreading scams.</p>
                             </div>
                         </div>
@@ -371,8 +390,54 @@
                     </div>
                     <div class="rule-details-container">
                         <div class="rule-details-inner">
-                            <div class="mt-4 pt-4 border-t border-white/10">
-                                <p class="text-sm text-gray-300">Self-promotion, duplicate messages, excessive media, selling growth methods, and harmful links are prohibited and grounds for immediate removal.</p>
+                            <div class="mt-4 pt-4 border-t border-white/10 text-sm text-gray-300">
+                                Self-promotion, duplicate messages, excessive media, mentions, selling growth methods, and harmful links are prohibited. Breaking this or the Ethical Community Growth Guidelines is grounds for immediate removal.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card glass-card expandable-card rounded-xl p-5" id="rule-6" onclick="toggleCard(this)">
+                    <div class="flex justify-between items-center gap-4">
+                        <div class="flex gap-5 items-center">
+                            <div class="w-8 text-2xl font-display font-bold text-white/20 text-center">6</div>
+                            <div>
+                                <h3 class="text-base font-bold text-white">Respect Others' Privacy</h3>
+                                <p class="text-xs text-spider-text mt-1">Never share private info without permission.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4 shrink-0">
+                            <button onclick="copyLink('rule-6', this, event)" class="text-xs bg-[#0a0a0c] text-gray-400 hover:text-white hover:bg-spider-red px-3 py-1.5 rounded border border-white/10 transition"><i class="fa-solid fa-link mr-1"></i> Snipe</button>
+                            <i class="fa-solid fa-chevron-down text-gray-400 expand-icon"></i>
+                        </div>
+                    </div>
+                    <div class="rule-details-container">
+                        <div class="rule-details-inner">
+                            <div class="mt-4 pt-4 border-t border-white/10 text-sm text-gray-300">
+                                Don't share anyone else's private information (real names, addresses, social media) without their permission. Malintentions will lead to removal.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card glass-card expandable-card rounded-xl p-5" id="rule-7" onclick="toggleCard(this)">
+                    <div class="flex justify-between items-center gap-4">
+                        <div class="flex gap-5 items-center">
+                            <div class="w-8 text-2xl font-display font-bold text-white/20 text-center">7</div>
+                            <div>
+                                <h3 class="text-base font-bold text-white">User Profile Criteria</h3>
+                                <p class="text-xs text-spider-text mt-1">No disruptive names or impersonation.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4 shrink-0">
+                            <button onclick="copyLink('rule-7', this, event)" class="text-xs bg-[#0a0a0c] text-gray-400 hover:text-white hover:bg-spider-red px-3 py-1.5 rounded border border-white/10 transition"><i class="fa-solid fa-link mr-1"></i> Snipe</button>
+                            <i class="fa-solid fa-chevron-down text-gray-400 expand-icon"></i>
+                        </div>
+                    </div>
+                    <div class="rule-details-container">
+                        <div class="rule-details-inner">
+                            <div class="mt-4 pt-4 border-t border-white/10 text-sm text-gray-300">
+                                Do not use unreadable names. Profiles must adhere to rules and cannot impersonate others. Staff reserve the right to take action based on profile severity.
                             </div>
                         </div>
                     </div>
@@ -383,8 +448,8 @@
                         <div class="flex gap-5 items-center">
                             <div class="w-8 text-2xl font-display font-bold text-white/20 text-center">8</div>
                             <div>
-                                <h3 class="text-base font-bold text-white">No Hate Speech</h3>
-                                <p class="text-xs text-spider-text mt-1">Discrimination, sensitive topics, and fake profiles are forbidden.</p>
+                                <h3 class="text-base font-bold text-white">No Hate Speech or Sensitive Material</h3>
+                                <p class="text-xs text-spider-text mt-1">Discrimination and sensitive topics are forbidden.</p>
                             </div>
                         </div>
                         <div class="flex items-center gap-4 shrink-0">
@@ -394,8 +459,54 @@
                     </div>
                     <div class="rule-details-container">
                         <div class="rule-details-inner">
-                            <div class="mt-4 pt-4 border-t border-white/10">
-                                <p class="text-sm text-gray-300">Discrimination, hate speech, or discussions on politics, religion, violence, or regulated goods are strictly forbidden. Report suspicious DMs to staff.</p>
+                            <div class="mt-4 pt-4 border-t border-white/10 text-sm text-gray-300">
+                                Discrimination, hate speech, or discussions on politics, religion, violence, or regulated goods are strictly forbidden. Report suspicious DMs to staff.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card glass-card expandable-card rounded-xl p-5" id="rule-9" onclick="toggleCard(this)">
+                    <div class="flex justify-between items-center gap-4">
+                        <div class="flex gap-5 items-center">
+                            <div class="w-8 text-2xl font-display font-bold text-white/20 text-center">9</div>
+                            <div>
+                                <h3 class="text-base font-bold text-white">Staff Intervention</h3>
+                                <p class="text-xs text-spider-text mt-1">Staff may review chat and join VCs to investigate.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4 shrink-0">
+                            <button onclick="copyLink('rule-9', this, event)" class="text-xs bg-[#0a0a0c] text-gray-400 hover:text-white hover:bg-spider-red px-3 py-1.5 rounded border border-white/10 transition"><i class="fa-solid fa-link mr-1"></i> Snipe</button>
+                            <i class="fa-solid fa-chevron-down text-gray-400 expand-icon"></i>
+                        </div>
+                    </div>
+                    <div class="rule-details-container">
+                        <div class="rule-details-inner">
+                            <div class="mt-4 pt-4 border-t border-white/10 text-sm text-gray-300">
+                                If a user pings staff regarding suspicious activity, they may review the chat first. If inappropriate activity is found, they may join the VC to investigate and take action.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card glass-card expandable-card rounded-xl p-5" id="rule-10" onclick="toggleCard(this)">
+                    <div class="flex justify-between items-center gap-4">
+                        <div class="flex gap-5 items-center">
+                            <div class="w-8 text-2xl font-display font-bold text-white/20 text-center">10</div>
+                            <div>
+                                <h3 class="text-base font-bold text-white">Media Spam</h3>
+                                <p class="text-xs text-spider-text mt-1">Spamming videos, GIFs, or images is not allowed.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4 shrink-0">
+                            <button onclick="copyLink('rule-10', this, event)" class="text-xs bg-[#0a0a0c] text-gray-400 hover:text-white hover:bg-spider-red px-3 py-1.5 rounded border border-white/10 transition"><i class="fa-solid fa-link mr-1"></i> Snipe</button>
+                            <i class="fa-solid fa-chevron-down text-gray-400 expand-icon"></i>
+                        </div>
+                    </div>
+                    <div class="rule-details-container">
+                        <div class="rule-details-inner">
+                            <div class="mt-4 pt-4 border-t border-white/10 text-sm text-gray-300">
+                                Spamming videos, images, GIFs, or any other media content is not allowed and may result in moderation actions. Use appropriate channels and include case IDs when contesting warnings.
                             </div>
                         </div>
                     </div>
@@ -406,47 +517,59 @@
 
         <section id="staff" class="category-section">
             <div class="mb-8 border-b border-white/10 pb-4">
-                <h2 class="text-3xl font-display font-bold text-white tracking-wide"><span class="text-spider-red mr-2">03.</span> Staff Structure</h2>
+                <h2 class="text-3xl font-display font-bold text-white tracking-wide"><span class="text-spider-red mr-2">03.</span> Server Staff Structure</h2>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 
-                <div class="info-card glass-card rounded-xl p-6 text-center relative border-spider-red/30" id="role-senpai">
+                <div class="info-card glass-card rounded-xl p-6 text-center relative border-spider-red/30 lg:col-span-2" id="role-senpai">
                     <div class="text-4xl mb-4 icon-red"><i class="fa-solid fa-spider"></i></div>
                     <h3 class="text-lg font-bold text-white tracking-wide">Senpai Spider</h3>
                     <p class="text-[10px] text-spider-red font-bold uppercase tracking-widest mb-3">Founder</p>
                     <p class="text-xs text-gray-300 leading-relaxed font-medium">The special leadership and founder role who stands at the very top of the community.</p>
                 </div>
 
-                <div class="info-card glass-card rounded-xl p-6 text-center border-yellow-500/20" id="role-manager">
+                <div class="info-card glass-card rounded-xl p-6 text-center border-yellow-500/20 lg:col-span-2" id="role-manager">
                     <div class="text-4xl mb-4 icon-gold"><i class="fa-solid fa-crown"></i></div>
                     <h3 class="text-lg font-bold text-white tracking-wide">The Manager</h3>
                     <p class="text-[10px] text-yellow-500 font-bold uppercase tracking-widest mb-3">Ojas</p>
                     <p class="text-xs text-gray-300 leading-relaxed font-medium">Responsible for overseeing all teams and ensuring smooth server operations.</p>
                 </div>
 
-                <div class="info-card glass-card rounded-xl p-6 text-center" id="role-exec">
-                    <div class="text-4xl mb-4 icon-premium"><i class="fa-solid fa-user-tie"></i></div>
-                    <h3 class="text-lg font-bold text-white tracking-wide">Executive Team</h3>
-                    <p class="text-xs text-gray-300 mt-3 leading-relaxed">Senior staff who guide departments, make major decisions, and coordinate all activities.</p>
+                <div class="info-card glass-card rounded-xl p-5 text-center" id="role-exec">
+                    <div class="text-3xl mb-3 icon-premium"><i class="fa-solid fa-user-tie"></i></div>
+                    <h3 class="text-md font-bold text-white">Executive Team</h3>
+                    <p class="text-xs text-gray-400 mt-2">Guides departments, makes major decisions, and coordinates staff.</p>
                 </div>
 
-                <div class="info-card glass-card rounded-xl p-6 text-center" id="role-mod">
-                    <div class="text-4xl mb-4 icon-premium"><i class="fa-solid fa-shield"></i></div>
-                    <h3 class="text-lg font-bold text-white tracking-wide">Moderators</h3>
-                    <p class="text-xs text-gray-300 mt-3 leading-relaxed">The active enforcers who maintain chats, keep discussions healthy, and apply rules fairly.</p>
+                <div class="info-card glass-card rounded-xl p-5 text-center" id="role-mod">
+                    <div class="text-3xl mb-3 icon-premium"><i class="fa-solid fa-shield"></i></div>
+                    <h3 class="text-md font-bold text-white">Moderators</h3>
+                    <p class="text-xs text-gray-400 mt-2">Active enforcers who maintain chats and apply rules fairly.</p>
                 </div>
 
-                <div class="info-card glass-card rounded-xl p-6 text-center" id="role-trial">
-                    <div class="text-4xl mb-4 icon-premium"><i class="fa-solid fa-user-shield"></i></div>
-                    <h3 class="text-lg font-bold text-white tracking-wide">Trial Moderators</h3>
-                    <p class="text-xs text-gray-300 mt-3 leading-relaxed">New staff members learning the ropes, preparing to become full moderators.</p>
+                <div class="info-card glass-card rounded-xl p-5 text-center" id="role-trial">
+                    <div class="text-3xl mb-3 icon-premium"><i class="fa-solid fa-user-shield"></i></div>
+                    <h3 class="text-md font-bold text-white">Trial Moderators</h3>
+                    <p class="text-xs text-gray-400 mt-2">New staff learning the ropes to become full moderators.</p>
                 </div>
 
-                <div class="info-card glass-card rounded-xl p-6 text-center" id="role-vc">
-                    <div class="text-4xl mb-4 icon-premium"><i class="fa-solid fa-microphone-lines"></i></div>
-                    <h3 class="text-lg font-bold text-white tracking-wide">VC Department</h3>
-                    <p class="text-xs text-gray-300 mt-3 leading-relaxed">Dedicated to managing voice channels, keeping them friendly and organized.</p>
+                <div class="info-card glass-card rounded-xl p-5 text-center" id="role-vc">
+                    <div class="text-3xl mb-3 icon-premium"><i class="fa-solid fa-microphone-lines"></i></div>
+                    <h3 class="text-md font-bold text-white">VC Department</h3>
+                    <p class="text-xs text-gray-400 mt-2">Dedicated to managing voice channels and keeping them friendly.</p>
+                </div>
+
+                <div class="info-card glass-card rounded-xl p-5 text-center sm:col-span-2" id="role-ticket-mgr">
+                    <div class="text-3xl mb-3 icon-premium"><i class="fa-solid fa-ticket"></i></div>
+                    <h3 class="text-md font-bold text-white">Ticket Manager</h3>
+                    <p class="text-xs text-gray-400 mt-2">Handles the ticket system, ensuring fast resolution of issues.</p>
+                </div>
+
+                <div class="info-card glass-card rounded-xl p-5 text-center sm:col-span-2" id="role-ticket-dept">
+                    <div class="text-3xl mb-3 icon-premium"><i class="fa-solid fa-headset"></i></div>
+                    <h3 class="text-md font-bold text-white">Ticket Department</h3>
+                    <p class="text-xs text-gray-400 mt-2">Team dedicated to providing support to the community via tickets.</p>
                 </div>
             </div>
         </section>
@@ -465,17 +588,37 @@
                 <div class="info-card glass-card rounded-xl p-4 flex flex-col items-center text-center" id="spec-apex">
                     <i class="fa-solid fa-trophy text-2xl text-yellow-500 mb-2"></i>
                     <div class="font-bold text-yellow-500 text-sm">Apex Spiders</div>
-                    <div class="text-[11px] text-gray-400 mt-1">Great achievers of the year.</div>
+                    <div class="text-[11px] text-gray-400 mt-1">Honoring great achievers.</div>
                 </div>
                 <div class="info-card glass-card rounded-xl p-4 flex flex-col items-center text-center" id="spec-partner">
-                    <i class="fa-solid fa-robot text-2xl text-blue-400 mb-2"></i>
+                    <i class="fa-solid fa-robot text-2xl icon-blue mb-2"></i>
                     <div class="font-bold text-blue-400 text-sm">Partnered Bots</div>
-                    <div class="text-[11px] text-gray-400 mt-1">Officially partnered with us.</div>
+                    <div class="text-[11px] text-gray-400 mt-1">Officially partnered bots.</div>
+                </div>
+                <div class="info-card glass-card rounded-xl p-4 flex flex-col items-center text-center" id="spec-guest">
+                    <i class="fa-solid fa-passport text-2xl text-gray-400 mb-2"></i>
+                    <div class="font-bold text-gray-300 text-sm">Server Guest</div>
+                    <div class="text-[11px] text-gray-400 mt-1">Respected visitors.</div>
                 </div>
                 <div class="info-card glass-card rounded-xl p-4 flex flex-col items-center text-center" id="spec-memer">
                     <i class="fa-solid fa-masks-theater text-2xl text-green-400 mb-2"></i>
                     <div class="font-bold text-green-400 text-sm">Memer</div>
                     <div class="text-[11px] text-gray-400 mt-1">Active meme posters.</div>
+                </div>
+                <div class="info-card glass-card rounded-xl p-4 flex flex-col items-center text-center" id="spec-artist">
+                    <i class="fa-solid fa-palette text-2xl text-purple-400 mb-2"></i>
+                    <div class="font-bold text-purple-400 text-sm">Talented Artist</div>
+                    <div class="text-[11px] text-gray-400 mt-1">Art Works creators.</div>
+                </div>
+                <div class="info-card glass-card rounded-xl p-4 flex flex-col items-center text-center" id="spec-writer">
+                    <i class="fa-solid fa-feather text-2xl text-orange-300 mb-2"></i>
+                    <div class="font-bold text-orange-300 text-sm">Writers</div>
+                    <div class="text-[11px] text-gray-400 mt-1">Poetic horizon storytellers.</div>
+                </div>
+                <div class="info-card glass-card rounded-xl p-4 flex flex-col items-center text-center" id="spec-female">
+                    <i class="fa-solid fa-venus text-2xl text-pink-400 mb-2"></i>
+                    <div class="font-bold text-pink-400 text-sm">Verified Female</div>
+                    <div class="text-[11px] text-gray-400 mt-1">Trusted community members.</div>
                 </div>
                 
                 <!-- Boosters highlight -->
@@ -496,27 +639,46 @@
                 <h2 class="text-3xl font-display font-bold text-white tracking-wide"><span class="text-spider-red mr-2">05.</span> Level Rewards</h2>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                <div class="info-card glass-card rounded-xl p-3 flex items-center gap-4" id="lvl-5">
+                    <div class="w-10 h-10 rounded border border-white/10 flex items-center justify-center font-display font-bold text-lg text-gray-400 bg-[#0a0b10]">5</div>
+                    <div class="text-xs text-gray-300 font-medium">First step after beginner.</div>
+                </div>
                 <div class="info-card glass-card rounded-xl p-3 flex items-center gap-4" id="lvl-10">
-                    <div class="w-10 h-10 rounded border border-white/10 flex items-center justify-center font-display font-bold text-lg text-gray-200 bg-black/60">10</div>
+                    <div class="w-10 h-10 rounded border border-white/10 flex items-center justify-center font-display font-bold text-lg text-gray-200 bg-[#0a0b10]">10</div>
                     <div class="text-xs text-gray-300 font-medium">Ability to change nickname.</div>
                 </div>
                 <div class="info-card glass-card rounded-xl p-3 flex items-center gap-4" id="lvl-20">
-                    <div class="w-10 h-10 rounded border border-white/20 flex items-center justify-center font-display font-bold text-lg text-blue-400 bg-black/60">20</div>
-                    <div class="text-xs text-gray-300 font-medium">External emojis + Cam/Stream.</div>
+                    <div class="w-10 h-10 rounded border border-white/20 flex items-center justify-center font-display font-bold text-lg text-blue-400 bg-[#0a0b10]">20</div>
+                    <div class="text-xs text-gray-300 font-medium">External emojis + Cam/Stream in VCs.</div>
                 </div>
                 <div class="info-card glass-card rounded-xl p-3 flex items-center gap-4" id="lvl-30">
-                    <div class="w-10 h-10 rounded border border-white/20 flex items-center justify-center font-display font-bold text-lg text-green-400 bg-black/60">30</div>
+                    <div class="w-10 h-10 rounded border border-white/20 flex items-center justify-center font-display font-bold text-lg text-green-400 bg-[#0a0b10]">30</div>
                     <div class="text-xs text-gray-300 font-medium">GIFs & Soundboard access.</div>
                 </div>
-                <div class="info-card glass-card rounded-xl p-3 flex items-center gap-4" id="lvl-50">
-                    <div class="w-10 h-10 rounded border border-white/20 flex items-center justify-center font-display font-bold text-lg text-orange-400 bg-black/60">50</div>
-                    <div class="text-xs text-gray-300 font-medium">Create threads & Ext. stickers.</div>
+                <div class="info-card glass-card rounded-xl p-3 flex items-center gap-4" id="lvl-40">
+                    <div class="w-10 h-10 rounded border border-white/20 flex items-center justify-center font-display font-bold text-lg text-yellow-400 bg-[#0a0b10]">40</div>
+                    <div class="text-xs text-gray-300 font-medium">Attach files & Rename custom VC.</div>
                 </div>
-
+                <div class="info-card glass-card rounded-xl p-3 flex items-center gap-4" id="lvl-50">
+                    <div class="w-10 h-10 rounded border border-white/20 flex items-center justify-center font-display font-bold text-lg text-orange-400 bg-[#0a0b10]">50</div>
+                    <div class="text-xs text-gray-300 font-medium">Create threads & External stickers.</div>
+                </div>
                 <div class="info-card glass-card rounded-xl p-3 flex items-center gap-4 border-spider-blue/30" id="lvl-60">
                     <div class="w-10 h-10 rounded border border-spider-blue/50 flex items-center justify-center font-display font-bold text-lg text-blue-400 bg-[#06122b]">60</div>
                     <div class="text-xs text-blue-200 font-medium">Spider's Club & Spider's VC.</div>
+                </div>
+                <div class="info-card glass-card rounded-xl p-3 flex items-center gap-4" id="lvl-70">
+                    <div class="w-10 h-10 rounded border border-white/20 flex items-center justify-center font-display font-bold text-lg text-purple-400 bg-[#0a0b10]">70</div>
+                    <div class="text-xs text-gray-300 font-medium">Special CMDs & Ext Soundboard.</div>
+                </div>
+                <div class="info-card glass-card rounded-xl p-3 flex items-center gap-4" id="lvl-80">
+                    <div class="w-10 h-10 rounded border border-white/20 flex items-center justify-center font-display font-bold text-lg text-pink-400 bg-[#0a0b10]">80</div>
+                    <div class="text-xs text-gray-300 font-medium">Special colour roles & threads.</div>
+                </div>
+                <div class="info-card glass-card rounded-xl p-3 flex items-center gap-4" id="lvl-90">
+                    <div class="w-10 h-10 rounded border border-white/20 flex items-center justify-center font-display font-bold text-lg text-red-400 bg-[#0a0b10]">90</div>
+                    <div class="text-xs text-gray-300 font-medium">Special icon roles.</div>
                 </div>
 
                 <div class="info-card glass-card border border-spider-red/40 rounded-xl p-4 flex items-center gap-5 sm:col-span-2" id="lvl-100">
@@ -536,12 +698,11 @@
     </main>
 
     <script>
-        // --- Click to Expand Logic ---
+        // --- UI Interactions ---
         function toggleCard(cardElement) {
             cardElement.classList.toggle('expanded');
         }
 
-        // --- Tab Navigation Logic ---
         function showCategory(categoryId, btnElement) {
             document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
             if(btnElement) btnElement.classList.add('active');
@@ -556,7 +717,6 @@
             });
         }
 
-        // --- Live Search Logic ---
         function searchContent() {
             const input = document.getElementById('searchBar').value.toLowerCase();
             const cards = document.querySelectorAll('.info-card');
@@ -572,7 +732,6 @@
             }
         }
 
-        // --- Mod Sniper Link Logic ---
         function copyLink(id, btnElement, event) {
             event.stopPropagation(); 
             const url = window.location.href.split('#')[0] + '#' + id;
@@ -590,8 +749,10 @@
             });
         }
 
-        // --- Check for Sniper Links on Load ---
         window.addEventListener('DOMContentLoaded', () => {
+            // Ensure first tab is visible on load
+            showCategory('all', document.querySelector('.nav-btn.active'));
+
             if(window.location.hash) {
                 const id = window.location.hash.substring(1);
                 const targetElement = document.getElementById(id);
@@ -614,146 +775,106 @@
             }
         });
 
-        // --- Symbiote Tendril Physics Engine (Canvas 2D) ---
-        window.onload = function() {
-            const canvas = document.getElementById('symbiote-canvas');
-            const ctx = canvas.getContext('2d');
-            let width, height;
+        // --- Interactive Elastic Web Physics Engine ---
+        const canvas = document.getElementById('web-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let points = [];
+        let mouse = { x: -1000, y: -1000 };
 
-            function resize() {
-                width = canvas.width = window.innerWidth;
-                height = canvas.height = window.innerHeight;
+        function initCanvas() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            points = [];
+            
+            // Grid spacing dictates web density
+            const spacing = 90;
+            for (let x = -50; x <= width + 50; x += spacing) {
+                for (let y = -50; y <= height + 50; y += spacing) {
+                    // Offset points slightly for an organic web look
+                    points.push({
+                        x: x + (Math.random() - 0.5) * 40,
+                        y: y + (Math.random() - 0.5) * 40,
+                        ox: x, 
+                        oy: y,
+                        vx: 0, 
+                        vy: 0
+                    });
+                }
             }
-            window.addEventListener('resize', resize);
-            resize();
+        }
 
-            let mouse = { x: width / 2, y: height / 2 };
-            let lastMouse = { x: width / 2, y: height / 2 };
-            let isAgitated = false;
-            let calmTimeout = null;
+        window.addEventListener('resize', initCanvas);
+        window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+        window.addEventListener('mouseleave', () => { mouse.x = -1000; mouse.y = -1000; });
 
-            // Track mouse speed to trigger "agitated" retreat state
-            window.addEventListener('mousemove', (e) => {
-                mouse.x = e.clientX;
-                mouse.y = e.clientY;
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            
+            // 1. Update Physics
+            points.forEach(p => {
+                let dx = mouse.x - p.x;
+                let dy = mouse.y - p.y;
+                let dist = Math.hypot(dx, dy);
                 
-                let speed = Math.hypot(mouse.x - lastMouse.x, mouse.y - lastMouse.y);
-                if (speed > 15) {
-                    isAgitated = true;
-                    clearTimeout(calmTimeout);
-                    calmTimeout = setTimeout(() => { isAgitated = false; }, 500);
+                // Mouse interaction radius
+                if (dist < 180) {
+                    let force = (180 - dist) / 180;
+                    // Elastic stretch towards the mouse
+                    p.vx += (dx / dist) * force * 0.9;
+                    p.vy += (dy / dist) * force * 0.9;
                 }
-                lastMouse.x = mouse.x;
-                lastMouse.y = mouse.y;
+                
+                // Spring logic to return to original positions
+                p.vx += (p.ox - p.x) * 0.08;
+                p.vy += (p.oy - p.y) * 0.08;
+                
+                // Friction
+                p.vx *= 0.88;
+                p.vy *= 0.88;
+                
+                p.x += p.vx;
+                p.y += p.vy;
             });
-
-            // The IK Tendril Class
-            class Tendril {
-                constructor(x, y, numSegments, segLength, color) {
-                    this.baseX = x;
-                    this.baseY = y;
-                    this.segments = Array.from({length: numSegments}, () => ({x, y}));
-                    this.segLength = segLength;
-                    this.color = color;
-                    this.baseAngle = Math.atan2(height/2 - y, width/2 - x); 
-                    this.wanderOffset = Math.random() * 100;
-                }
-
-                update(time) {
-                    let head = this.segments[this.segments.length - 1];
-                    let target = {x: 0, y: 0};
-                    let distToMouse = Math.hypot(mouse.x - this.baseX, mouse.y - this.baseY);
-                    let reach = this.segments.length * this.segLength;
-
-                    // If slow and mouse is close enough, ATTACK. Else, RETREAT & WANDER.
-                    if (!isAgitated && distToMouse < reach * 1.5) {
-                        target.x = mouse.x;
-                        target.y = mouse.y;
-                    } else {
-                        let angle = this.baseAngle + Math.sin(time * 0.002 + this.wanderOffset) * 0.8;
-                        target.x = this.baseX + Math.cos(angle) * (reach * 0.5);
-                        target.y = this.baseY + Math.sin(angle) * (reach * 0.5);
-                    }
-
-                    // Lerp Head towards target quickly
-                    head.x += (target.x - head.x) * 0.3;
-                    head.y += (target.y - head.y) * 0.3;
-
-                    // FABRIK Inverse Kinematics (Backward Pass)
-                    for (let i = this.segments.length - 2; i >= 0; i--) {
-                        let dx = this.segments[i].x - this.segments[i+1].x;
-                        let dy = this.segments[i].y - this.segments[i+1].y;
-                        let dist = Math.hypot(dx, dy);
-                        if (dist > 0) {
-                            this.segments[i].x = this.segments[i+1].x + (dx / dist) * this.segLength;
-                            this.segments[i].y = this.segments[i+1].y + (dy / dist) * this.segLength;
-                        }
-                    }
-
-                    // FABRIK Inverse Kinematics (Forward Pass - Anchor Base)
-                    this.segments[0].x = this.baseX;
-                    this.segments[0].y = this.baseY;
-                    for (let i = 1; i < this.segments.length; i++) {
-                        let dx = this.segments[i].x - this.segments[i-1].x;
-                        let dy = this.segments[i].y - this.segments[i-1].y;
-                        let dist = Math.hypot(dx, dy);
-                        if (dist > 0) {
-                            this.segments[i].x = this.segments[i-1].x + (dx / dist) * this.segLength;
-                            this.segments[i].y = this.segments[i-1].y + (dy / dist) * this.segLength;
-                        }
-                    }
-                }
-
-                draw(ctx) {
-                    // Draw tapered line (thicker at base, thin at tip)
-                    for (let i = 0; i < this.segments.length - 1; i++) {
+            
+            // 2. Draw Elastic Strands
+            ctx.lineCap = 'round';
+            for (let i = 0; i < points.length; i++) {
+                let p1 = points[i];
+                for (let j = i + 1; j < points.length; j++) {
+                    let p2 = points[j];
+                    // Base distance check using original anchors
+                    let odist = Math.hypot(p1.ox - p2.ox, p1.oy - p2.oy);
+                    
+                    if (odist < 140) { // Connection threshold
+                        let cdist = Math.hypot(p1.x - p2.x, p1.y - p2.y);
+                        let stretch = Math.abs(cdist - odist); // How far has it stretched?
+                        
                         ctx.beginPath();
-                        ctx.moveTo(this.segments[i].x, this.segments[i].y);
-                        ctx.lineTo(this.segments[i+1].x, this.segments[i+1].y);
-                        ctx.strokeStyle = this.color;
-                        ctx.lineWidth = 1 + (3 * (1 - i / this.segments.length)); 
-                        ctx.lineCap = 'round';
+                        ctx.moveTo(p1.x, p1.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        
+                        if (stretch > 5) {
+                            // Glow neon Red/Blue when stretched
+                            let intensity = Math.min(stretch / 25, 1);
+                            ctx.strokeStyle = `rgba(230, 36, 41, ${0.1 + intensity * 0.8})`; 
+                            ctx.lineWidth = 1 + intensity * 2;
+                        } else {
+                            // Subdued sleek grey base color
+                            ctx.strokeStyle = `rgba(100, 115, 140, 0.15)`; 
+                            ctx.lineWidth = 1;
+                        }
                         ctx.stroke();
                     }
                 }
             }
-
-            // Spawn 45 Small Tendrils around the edges
-            const tendrils = [];
-            const colors = ['rgba(230, 36, 41, 0.7)', 'rgba(136, 14, 21, 0.8)', 'rgba(20, 20, 25, 0.9)'];
             
-            function spawnEdgeTendril() {
-                let x, y;
-                let edge = Math.random();
-                if (edge < 0.25) { x = -20; y = Math.random() * height; } // Left
-                else if (edge < 0.5) { x = width + 20; y = Math.random() * height; } // Right
-                else if (edge < 0.75) { x = Math.random() * width; y = -20; } // Top
-                else { x = Math.random() * width; y = height + 20; } // Bottom
-
-                let numSegments = 15 + Math.floor(Math.random() * 15);
-                let segLength = 8 + Math.random() * 5;
-                let color = colors[Math.floor(Math.random() * colors.length)];
-                
-                tendrils.push(new Tendril(x, y, numSegments, segLength, color));
-            }
-
-            for(let i=0; i<45; i++) spawnEdgeTendril();
-
-            function animate(time) {
-                // Clear with slight trailing effect
-                ctx.fillStyle = 'rgba(5, 5, 7, 0.4)';
-                ctx.fillRect(0, 0, width, height);
-
-                tendrils.forEach(t => {
-                    t.update(time);
-                    t.draw(ctx);
-                });
-
-                requestAnimationFrame(animate);
-            }
-
-            animate(0);
-        };
+            requestAnimationFrame(animate);
+        }
+        
+        // Start engine
+        initCanvas();
+        animate();
     </script>
 </body>
 </html>
