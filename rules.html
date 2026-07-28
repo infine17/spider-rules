@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spider's Web | Official Rulebook & Directory</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        spider: {
+                            dark: '#0a0a0c',
+                            panel: '#13151a',
+                            border: '#1f2430',
+                            red: '#e62429',
+                            redglow: 'rgba(230, 36, 41, 0.5)',
+                            text: '#a1a1aa'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #0a0a0c;
+            color: #f4f4f5;
+            /* Subtle web-like dot pattern */
+            background-image: radial-gradient(#1f2430 1px, transparent 1px);
+            background-size: 20px 20px;
+            scroll-behavior: smooth;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0a0a0c; }
+        ::-webkit-scrollbar-thumb { background: #1f2430; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #e62429; }
+
+        /* The Sniper Highlight Animation */
+        @keyframes target-pulse {
+            0% { box-shadow: 0 0 0 0 rgba(230, 36, 41, 0.7); border-color: #e62429; }
+            70% { box-shadow: 0 0 0 15px rgba(230, 36, 41, 0); border-color: #e62429; }
+            100% { box-shadow: 0 0 0 0 rgba(230, 36, 41, 0); border-color: #1f2430; }
+        }
+        
+        .targeted {
+            animation: target-pulse 2s infinite;
+            border-left: 4px solid #e62429 !important;
+            transform: scale(1.02);
+            z-index: 10;
+        }
+
+        /* Expandable Details Smoothness */
+        details > summary { list-style: none; }
+        details > summary::-webkit-details-marker { display: none; }
+        
+        /* Card Hover Effects */
+        .info-card { transition: all 0.3s ease; }
+        .info-card:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+    </style>
+</head>
+<body class="font-sans antialiased min-h-screen pb-20">
+
+    <header class="bg-spider-panel border-b border-spider-border sticky top-0 z-50 shadow-2xl">
+        <div class="max-w-6xl mx-auto px-4 py-6">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-spider-red rounded-full flex items-center justify-center text-2xl shadow-[0_0_15px_rgba(230,36,41,0.5)]">
+                        🕷️
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-extrabold tracking-tight text-white uppercase">Spider's Web</h1>
+                        <p class="text-xs text-spider-text tracking-widest uppercase">Official Community Directory</p>
+                    </div>
+                </div>
+                
+                <div class="w-full md:w-96 relative">
+                    <input type="text" id="searchBar" onkeyup="searchContent()" placeholder="🔍 Search rules, roles, levels..." 
+                           class="w-full bg-spider-dark border border-spider-border text-white px-4 py-3 rounded-lg focus:outline-none focus:border-spider-red focus:ring-1 focus:ring-spider-red transition">
+                </div>
+            </div>
+
+            <nav class="flex overflow-x-auto gap-2 mt-6 pb-2 hide-scrollbar">
+                <button onclick="showCategory('all')" class="nav-btn px-4 py-2 bg-spider-red text-white font-semibold rounded-md whitespace-nowrap transition" id="btn-all">All</button>
+                <button onclick="showCategory('chat-rules')" class="nav-btn px-4 py-2 bg-spider-dark border border-spider-border hover:border-spider-text text-spider-text rounded-md whitespace-nowrap transition" id="btn-chat-rules">Chat Rules</button>
+                <button onclick="showCategory('community-rules')" class="nav-btn px-4 py-2 bg-spider-dark border border-spider-border hover:border-spider-text text-spider-text rounded-md whitespace-nowrap transition" id="btn-community-rules">Community Rules</button>
+                <button onclick="showCategory('staff')" class="nav-btn px-4 py-2 bg-spider-dark border border-spider-border hover:border-spider-text text-spider-text rounded-md whitespace-nowrap transition" id="btn-staff">Staff Structure</button>
+                <button onclick="showCategory('roles')" class="nav-btn px-4 py-2 bg-spider-dark border border-spider-border hover:border-spider-text text-spider-text rounded-md whitespace-nowrap transition" id="btn-roles">Special Roles</button>
+                <button onclick="showCategory('levels')" class="nav-btn px-4 py-2 bg-spider-dark border border-spider-border hover:border-spider-text text-spider-text rounded-md whitespace-nowrap transition" id="btn-levels">Level Rewards</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 mt-10 space-y-16" id="main-content">
+
+        <section id="chat-rules" class="category-section">
+            <div class="mb-6 border-b border-spider-border pb-2">
+                <h2 class="text-3xl font-bold text-white flex items-center gap-2"><span class="text-spider-red">|</span> Chat Rules</h2>
+                <p class="text-spider-text mt-1">We want everyone to enjoy themselves and feel welcome here. Please abide by these rules.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="info-card bg-spider-panel border border-spider-border border-l-4 border-l-spider-red rounded-lg p-6 relative" id="article-1">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-xl font-bold text-white">Article 1: Civil Behaviour</h3>
+                        <button onclick="copyLink('article-1', this)" class="text-xs bg-spider-dark hover:bg-spider-red text-spider-text hover:text-white px-3 py-1 rounded transition border border-spider-border">🔗 Copy Link</button>
+                    </div>
+                    <ul class="space-y-3 text-sm text-gray-300">
+                        <li><strong class="text-spider-red">1.1</strong> Avoid bombarding the chat with too many emojis, repeated messages, or level-up attempts.</li>
+                        <li><strong class="text-spider-red">1.2</strong> Don't post links anywhere on the server or promote yourself or others.</li>
+                        <li><strong class="text-spider-red">1.3</strong> Greet and engage new members. Avoid being impolite, eerie, or violent. Use correct display names (no forced nicknames).</li>
+                        <li><strong class="text-spider-red">1.4</strong> Show respect for staff. No offensive names/PFPs (staff may alter them at any time).</li>
+                        <li><strong class="text-spider-red">1.5</strong> Never share someone else's pictures or personal info without consent.</li>
+                    </ul>
+                    <details class="mt-4 bg-spider-dark p-3 rounded-md cursor-pointer group border border-spider-border">
+                        <summary class="text-spider-text font-semibold outline-none group-open:text-spider-red transition">Edge Case: "I was just joking around!"</summary>
+                        <p class="text-gray-400 text-xs mt-2 border-l-2 border-spider-red pl-2">Intent does not matter if the behavior disrupts the chat or makes others uncomfortable. Staff discretion applies.</p>
+                    </details>
+                </div>
+
+                <div class="info-card bg-spider-panel border border-spider-border border-l-4 border-l-spider-red rounded-lg p-6 relative" id="article-2">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-xl font-bold text-white">Article 2: Following Instructions</h3>
+                        <button onclick="copyLink('article-2', this)" class="text-xs bg-spider-dark hover:bg-spider-red text-spider-text hover:text-white px-3 py-1 rounded transition border border-spider-border">🔗 Copy Link</button>
+                    </div>
+                    <ul class="space-y-3 text-sm text-gray-300">
+                        <li><strong class="text-spider-red">2.1</strong> You must change the topic if a staff member requests it. Noncompliance leads to kick/ban.</li>
+                        <li><strong class="text-spider-red">2.2</strong> Avoid tagging staff members unless it's for a significant occasion.</li>
+                        <li><strong class="text-spider-red">2.3</strong> Avoid arguing with moderators or staff. Their choices are final.</li>
+                    </ul>
+                </div>
+
+                <div class="info-card bg-spider-panel border border-spider-border border-l-4 border-l-spider-red rounded-lg p-6 relative" id="article-3">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-xl font-bold text-white">Article 3: Conflict Resolution</h3>
+                        <button onclick="copyLink('article-3', this)" class="text-xs bg-spider-dark hover:bg-spider-red text-spider-text hover:text-white px-3 py-1 rounded transition border border-spider-border">🔗 Copy Link</button>
+                    </div>
+                    <ul class="space-y-3 text-sm text-gray-300">
+                        <li><strong class="text-spider-red">3.1</strong> Blocking and moving on is the best course of action when someone is bothering you.</li>
+                        <li><strong class="text-spider-red">3.2</strong> It is assumed that you possess the common sense to recognise sarcasm and puns.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="community-rules" class="category-section">
+            <div class="mb-6 border-b border-spider-border pb-2">
+                <h2 class="text-3xl font-bold text-white flex items-center gap-2"><span class="text-spider-red">|</span> Community Rules</h2>
+                <p class="text-spider-text mt-1 text-sm bg-spider-dark p-3 rounded border border-spider-border inline-block">⚠️ The spirit of the rule is more important than its exact wording. Moderators have the last word.</p>
+            </div>
+
+            <div class="grid grid-cols-1 gap-4">
+                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-5 flex flex-col md:flex-row gap-4" id="rule-1">
+                    <div class="flex-shrink-0 text-3xl font-black text-spider-border">01</div>
+                    <div class="flex-grow">
+                        <div class="flex justify-between items-start">
+                            <h3 class="text-lg font-bold text-white">Follow Discord Terms of Service</h3>
+                            <button onclick="copyLink('rule-1', this)" class="text-xs bg-spider-dark hover:bg-spider-red text-spider-text hover:text-white px-2 py-1 rounded transition">🔗 Copy</button>
+                        </div>
+                        <p class="text-sm text-gray-300 mt-1">Abide by Discord guidelines. Violation can result in severe action, including permanent removal.</p>
+                    </div>
+                </div>
+
+                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-5 flex flex-col md:flex-row gap-4" id="rule-2">
+                    <div class="flex-shrink-0 text-3xl font-black text-spider-border">02</div>
+                    <div class="flex-grow">
+                        <div class="flex justify-between items-start">
+                            <h3 class="text-lg font-bold text-white">Keep Content Appropriate for All Ages</h3>
+                            <button onclick="copyLink('rule-2', this)" class="text-xs bg-spider-dark hover:bg-spider-red text-spider-text hover:text-white px-2 py-1 rounded transition">🔗 Copy</button>
+                        </div>
+                        <p class="text-sm text-gray-300 mt-1">No NSFW content (extreme violence, self-harm, explicit sexual content). Discussion related to such content must not share explicit media.</p>
+                        <details class="mt-3 bg-spider-dark p-2 rounded cursor-pointer group text-xs border border-spider-border">
+                            <summary class="text-spider-text font-semibold outline-none group-open:text-spider-red">Edge Case: "It was just a meme/art!"</summary>
+                            <p class="text-gray-400 mt-2">Drawn art, anime, or "joke" images that depict sexually explicit acts or extreme gore are still heavily strictly prohibited.</p>
+                        </details>
+                    </div>
+                </div>
+
+                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-5 flex flex-col md:flex-row gap-4" id="rule-3">
+                    <div class="flex-shrink-0 text-3xl font-black text-spider-border">03</div>
+                    <div class="flex-grow">
+                        <div class="flex justify-between items-start">
+                            <h3 class="text-lg font-bold text-white">Good Attitude & Respect Staff</h3>
+                            <button onclick="copyLink('rule-3', this)" class="text-xs bg-spider-dark hover:bg-spider-red text-spider-text hover:text-white px-2 py-1 rounded transition">🔗 Copy</button>
+                        </div>
+                        <p class="text-sm text-gray-300 mt-1">Be respectful. Disruptive/aggressive behavior is not tolerated. Address mod actions in tickets, NOT in public channels. Evading punishments leads to bans.</p>
+                    </div>
+                </div>
+
+                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-5 flex flex-col md:flex-row gap-4" id="rule-4">
+                    <div class="flex-shrink-0 text-3xl font-black text-spider-border">04</div>
+                    <div class="flex-grow">
+                        <div class="flex justify-between items-start">
+                            <h3 class="text-lg font-bold text-white">Speak Hinglish & Follow Channel Rules</h3>
+                            <button onclick="copyLink('rule-4', this)" class="text-xs bg-spider-dark hover:bg-spider-red text-spider-text hover:text-white px-2 py-1 rounded transition">🔗 Copy</button>
+                        </div>
+                        <p class="text-sm text-gray-300 mt-1">Official language is Hinglish (scriptures in English) so everyone understands. Read channel pins as some channels have specific exemptions/rules.</p>
+                    </div>
+                </div>
+
+                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-5 flex flex-col md:flex-row gap-4" id="rule-5">
+                    <div class="flex-shrink-0 text-3xl font-black text-spider-border">05</div>
+                    <div class="flex-grow">
+                        <div class="flex justify-between items-start">
+                            <h3 class="text-lg font-bold text-white">No Spam or Advertising</h3>
+                            <button onclick="copyLink('rule-5', this)" class="text-xs bg-spider-dark hover:bg-spider-red text-spider-text hover:text-white px-2 py-1 rounded transition">🔗 Copy</button>
+                        </div>
+                        <p class="text-sm text-gray-300 mt-1">No disruptive self-promotion, duplicate messages, wall-texts, or excessive pings/emojis. Selling server growth methods or posting scams results in an instant ban.</p>
+                    </div>
+                </div>
+
+                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-5 flex flex-col md:flex-row gap-4" id="rule-6">
+                    <div class="flex-shrink-0 text-3xl font-black text-spider-border">06</div>
+                    <div class="flex-grow">
+                        <div class="flex justify-between items-start">
+                            <h3 class="text-lg font-bold text-white">Respect Others' Privacy</h3>
+                            <button onclick="copyLink('rule-6', this)" class="text-xs bg-spider-dark hover:bg-spider-red text-spider-text hover:text-white px-2 py-1 rounded transition">🔗 Copy</button>
+                        </div>
+                        <p class="text-sm text-gray-300 mt-1">Do not share real names, addresses, or other social media accounts without permission. Doxxing leads to immediate removal.</p>
+                    </div>
+                </div>
+
+                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-5 flex flex-col md:flex-row gap-4" id="rule-7">
+                    <div class="flex-shrink-0 text-3xl font-black text-spider-border">07</div>
+                    <div class="flex-grow">
+                        <div class="flex justify-between items-start">
+                            <h3 class="text-lg font-bold text-white">Profile Criteria</h3>
+                            <button onclick="copyLink('rule-7', this)" class="text-xs bg-spider-dark hover:bg-spider-red text-spider-text hover:text-white px-2 py-1 rounded transition">🔗 Copy</button>
+                        </div>
+                        <p class="text-sm text-gray-300 mt-1">No unreadable/disruptive names. No impersonation of others. We will moderate default user profiles if they violate server rules.</p>
+                    </div>
+                </div>
+
+                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-5 flex flex-col md:flex-row gap-4" id="rule-8">
+                    <div class="flex-shrink-0 text-3xl font-black text-spider-border">08</div>
+                    <div class="flex-grow">
+                        <div class="flex justify-between items-start">
+                            <h3 class="text-lg font-bold text-white">No Hate Speech or Sensitive Topics</h3>
+                            <button onclick="copyLink('rule-8', this)" class="text-xs bg-spider-dark hover:bg-spider-red text-spider-text hover:text-white px-2 py-1 rounded transition">🔗 Copy</button>
+                        </div>
+                        <p class="text-sm text-gray-300 mt-1">Discrimination, hate speech, or debates on politics, religion, violence, or regulated goods are forbidden. Report suspicious DMs to staff immediately.</p>
+                    </div>
+                </div>
+
+                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-5 flex flex-col md:flex-row gap-4" id="rule-9-10">
+                    <div class="flex-shrink-0 text-3xl font-black text-spider-border">09</div>
+                    <div class="flex-grow">
+                        <div class="flex justify-between items-start">
+                            <h3 class="text-lg font-bold text-white">Staff Intervention & Media Spam</h3>
+                            <button onclick="copyLink('rule-9-10', this)" class="text-xs bg-spider-dark hover:bg-spider-red text-spider-text hover:text-white px-2 py-1 rounded transition">🔗 Copy</button>
+                        </div>
+                        <p class="text-sm text-gray-300 mt-1">If staff are pinged for suspicious VC activity, they may join to investigate. Spamming videos, GIFs, or images is prohibited.</p>
+                        <p class="text-xs text-spider-red mt-2 font-bold">To contest a warning, ping @Staff Team or open a ticket and INCLUDE YOUR CASE ID.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="staff" class="category-section">
+            <div class="mb-6 border-b border-spider-border pb-2">
+                <h2 class="text-3xl font-bold text-white flex items-center gap-2"><span class="text-spider-red">|</span> Staff Structure</h2>
+                <p class="text-spider-text mt-1">The backbone of our team keeping the community safe and welcoming.</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                
+                <div class="info-card bg-spider-panel border border-spider-red rounded-lg p-5 text-center relative overflow-hidden" id="role-senpai">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-spider-red"></div>
+                    <div class="text-4xl mb-2">🕷️</div>
+                    <h3 class="text-lg font-bold text-white">Senpai Spider</h3>
+                    <p class="text-xs text-spider-red font-bold uppercase tracking-wider mb-2">Founder</p>
+                    <p class="text-sm text-gray-400">The special leadership and founder role who stands at the very top of the community.</p>
+                    <button onclick="copyLink('role-senpai', this)" class="mt-3 text-xs bg-spider-dark text-spider-text px-2 py-1 rounded">🔗 Copy</button>
+                </div>
+
+                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-5 text-center" id="role-manager">
+                    <div class="text-4xl mb-2">👑</div>
+                    <h3 class="text-lg font-bold text-white">The Manager (Ojas)</h3>
+                    <p class="text-sm text-gray-400 mt-2">Responsible for overseeing all teams and ensuring smooth server operations.</p>
+                    <button onclick="copyLink('role-manager', this)" class="mt-3 text-xs bg-spider-dark text-spider-text px-2 py-1 rounded">🔗 Copy</button>
+                </div>
+
+                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-5 text-center" id="role-exec">
+                    <div class="text-4xl mb-2">👔</div>
+                    <h3 class="text-lg font-bold text-white">Executive Team</h3>
+                    <p class="text-sm text-gray-400 mt-2">Senior staff who guide departments, make major decisions, and coordinate all staff activities.</p>
+                    <button onclick="copyLink('role-exec', this)" class="mt-3 text-xs bg-spider-dark text-spider-text px-2 py-1 rounded">🔗 Copy</button>
+                </div>
+
+                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-5 text-center" id="role-mod">
+                    <div class="text-4xl mb-2">🛡️</div>
+                    <h3 class="text-lg font-bold text-white">Moderators</h3>
+                    <p class="text-sm text-gray-400 mt-2">The active enforcers who maintain chats, keep discussions healthy, and apply rules fairly.</p>
+                </div>
+
+                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-5 text-center" id="role-trial">
+                    <div class="text-4xl mb-2">🔰</div>
+                    <h3 class="text-lg font-bold text-white">Trial Moderators</h3>
+                    <p class="text-sm text-gray-400 mt-2">New staff members learning the ropes, preparing to become full moderators.</p>
+                </div>
+
+                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-5 text-center" id="role-vc">
+                    <div class="text-4xl mb-2">🎙️</div>
+                    <h3 class="text-lg font-bold text-white">VC Department</h3>
+                    <p class="text-sm text-gray-400 mt-2">Dedicated to managing voice channels, making sure voice chats stay friendly and organized.</p>
+                </div>
+
+                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-5 text-center" id="role-ticket-mgr">
+                    <div class="text-4xl mb-2">🎫</div>
+                    <h3 class="text-lg font-bold text-white">Ticket Manager</h3>
+                    <p class="text-sm text-gray-400 mt-2">Handles the ticket system, ensuring member issues and requests are resolved quickly.</p>
+                </div>
+
+                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-5 text-center sm:col-span-2 lg:col-span-2" id="role-ticket-dept">
+                    <div class="text-4xl mb-2">📨</div>
+                    <h3 class="text-lg font-bold text-white">Ticket Department</h3>
+                    <p class="text-sm text-gray-400 mt-2">A team dedicated to working together on tickets, providing support to the community whenever needed.</p>
+                </div>
+
+            </div>
+        </section>
+
+        <section id="roles" class="category-section">
+            <div class="mb-6 border-b border-spider-border pb-2">
+                <h2 class="text-3xl font-bold text-white flex items-center gap-2"><span class="text-spider-red">|</span> Special Roles</h2>
+                <p class="text-spider-text mt-1">Unique roles and what they represent in our community.</p>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div class="info-card bg-spider-panel border border-spider-border rounded p-4" id="spec-bff"><div class="font-bold text-white">🤝 Best Friends</div><div class="text-xs text-gray-400 mt-1">Senpai's closest companions.</div></div>
+                <div class="info-card bg-spider-panel border border-spider-border rounded p-4" id="spec-apex"><div class="font-bold text-yellow-400">🏆 The Apex Spiders</div><div class="text-xs text-gray-400 mt-1">Great achievers of the last year.</div></div>
+                <div class="info-card bg-spider-panel border border-spider-border rounded p-4" id="spec-bots"><div class="font-bold text-blue-400">🤖 Partnered Bots</div><div class="text-xs text-gray-400 mt-1">Official server bots.</div></div>
+                <div class="info-card bg-spider-panel border border-spider-border rounded p-4" id="spec-guest"><div class="font-bold text-white">🎫 Server Guest</div><div class="text-xs text-gray-400 mt-1">Respected visitors with limited access.</div></div>
+                <div class="info-card bg-spider-panel border border-spider-border rounded p-4" id="spec-memer"><div class="font-bold text-green-400">🤡 Memer</div><div class="text-xs text-gray-400 mt-1">Active meme posters.</div></div>
+                <div class="info-card bg-spider-panel border border-spider-border rounded p-4" id="spec-artist"><div class="font-bold text-pink-400">🎨 Talented Artist</div><div class="text-xs text-gray-400 mt-1">Creators in Art Works.</div></div>
+                <div class="info-card bg-spider-panel border border-spider-border rounded p-4" id="spec-writer"><div class="font-bold text-purple-400">✍️ Writers</div><div class="text-xs text-gray-400 mt-1">Poets and storytellers.</div></div>
+                <div class="info-card bg-spider-panel border border-spider-border rounded p-4" id="spec-female"><div class="font-bold text-rose-300">🌸 Verified Female</div><div class="text-xs text-gray-400 mt-1">Trusted verified members.</div></div>
+                
+                <div class="info-card bg-spider-panel border border-[#ff73fa] shadow-[0_0_10px_rgba(255,115,250,0.2)] rounded p-4 col-span-2 md:col-span-4 flex items-center justify-between" id="spec-crystal">
+                    <div>
+                        <div class="font-bold text-[#ff73fa] text-lg">💎 Crystals (Boosters)</div>
+                        <div class="text-sm text-gray-300 mt-1">Supporters who boost the server. Gain higher-level perks and exclusive channels where SenpaiSpider is active.</div>
+                    </div>
+                    <button onclick="copyLink('spec-crystal', this)" class="text-xs bg-spider-dark text-spider-text px-3 py-2 rounded border border-spider-border">🔗 Copy</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="levels" class="category-section">
+            <div class="mb-6 border-b border-spider-border pb-2">
+                <h2 class="text-3xl font-bold text-white flex items-center gap-2"><span class="text-spider-red">|</span> Leveling Rewards</h2>
+                <p class="text-spider-text mt-1">Chat actively to earn XP and unlock these exclusive server perks.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-4 flex items-center gap-4" id="lvl-5">
+                    <div class="w-12 h-12 rounded bg-spider-dark border border-spider-border flex items-center justify-center font-black text-xl text-gray-400">5</div>
+                    <div class="text-sm text-gray-300">First step after beginner.</div>
+                </div>
+                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-4 flex items-center gap-4" id="lvl-10">
+                    <div class="w-12 h-12 rounded bg-spider-dark border border-spider-border flex items-center justify-center font-black text-xl text-gray-300">10</div>
+                    <div class="text-sm text-gray-300">Ability to change your nickname.</div>
+                </div>
+                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-4 flex items-center gap-4" id="lvl-20">
+                    <div class="w-12 h-12 rounded bg-spider-dark border border-spider-border flex items-center justify-center font-black text-xl text-blue-400">20</div>
+                    <div class="text-sm text-gray-300">External emojis + Screen share/Camera in VC.</div>
+                </div>
+                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-4 flex items-center gap-4" id="lvl-30">
+                    <div class="w-12 h-12 rounded bg-spider-dark border border-spider-border flex items-center justify-center font-black text-xl text-green-400">30</div>
+                    <div class="text-sm text-gray-300">GIFs & Soundboard access.</div>
+                </div>
+                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-4 flex items-center gap-4" id="lvl-40">
+                    <div class="w-12 h-12 rounded bg-spider-dark border border-spider-border flex items-center justify-center font-black text-xl text-yellow-400">40</div>
+                    <div class="text-sm text-gray-300">Attach files in chat & Rename custom VC.</div>
+                </div>
+                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-4 flex items-center gap-4" id="lvl-50">
+                    <div class="w-12 h-12 rounded bg-spider-dark border border-spider-border flex items-center justify-center font-black text-xl text-orange-400">50</div>
+                    <div class="text-sm text-gray-300">Create private/public threads & External stickers.</div>
+                </div>
+
+                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-4 flex items-center gap-4" id="lvl-60">
+                    <div class="w-12 h-12 rounded bg-spider-dark border border-spider-border flex items-center justify-center font-black text-xl text-spider-red">60</div>
+                    <div class="text-sm text-gray-300">Membership to Spider's Club & Spider's VC.</div>
+                </div>
+                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-4 flex items-center gap-4" id="lvl-70">
+                    <div class="w-12 h-12 rounded bg-spider-dark border border-spider-border flex items-center justify-center font-black text-xl text-purple-400">70</div>
+                    <div class="text-sm text-gray-300">Special CMDs & External Soundboard access.</div>
+                </div>
+                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-4 flex items-center gap-4" id="lvl-80">
+                    <div class="w-12 h-12 rounded bg-spider-dark border border-spider-border flex items-center justify-center font-black text-xl text-pink-500">80</div>
+                    <div class="text-sm text-gray-300">Special colour roles.</div>
+                </div>
+                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-4 flex items-center gap-4" id="lvl-90">
+                    <div class="w-12 h-12 rounded bg-spider-dark border border-spider-border flex items-center justify-center font-black text-xl text-red-600">90</div>
+                    <div class="text-sm text-gray-300">Special icon roles.</div>
+                </div>
+                <div class="info-card bg-spider-panel border border-red-500 shadow-[0_0_15px_rgba(230,36,41,0.3)] rounded-lg p-4 flex items-center gap-4 sm:col-span-2 lg:col-span-2" id="lvl-100">
+                    <div class="w-16 h-16 rounded-full bg-spider-red flex items-center justify-center font-black text-2xl text-white shadow-[0_0_10px_rgba(230,36,41,0.8)]">100</div>
+                    <div>
+                        <div class="font-bold text-white text-lg">Maxed Out Role</div>
+                        <div class="text-sm text-gray-300">Custom auto react & Talkshow/Event priority. You've reached the top.</div>
+                    </div>
+                    <button onclick="copyLink('lvl-100', this)" class="ml-auto text-xs bg-spider-dark text-spider-text px-3 py-2 rounded border border-spider-border">🔗 Copy</button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // Tab Navigation Logic
+        function showCategory(categoryId) {
+            // Update button styles
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-spider-red', 'text-white');
+                btn.classList.add('bg-spider-dark', 'text-spider-text');
+            });
+            document.getElementById('btn-' + categoryId).classList.remove('bg-spider-dark', 'text-spider-text');
+            document.getElementById('btn-' + categoryId).classList.add('bg-spider-red', 'text-white');
+
+            // Show/Hide Sections
+            const sections = document.querySelectorAll('.category-section');
+            sections.forEach(section => {
+                if (categoryId === 'all' || section.id === categoryId) {
+                    section.style.display = 'block';
+                } else {
+                    section.style.display = 'none';
+                }
+            });
+            
+            // Clear search bar when switching tabs
+            document.getElementById('searchBar').value = '';
+            searchContent(); 
+        }
+
+        // Live Search Logic
+        function searchContent() {
+            const input = document.getElementById('searchBar').value.toLowerCase();
+            const cards = document.querySelectorAll('.info-card');
+
+            cards.forEach(card => {
+                const text = card.innerText.toLowerCase();
+                if (text.includes(input)) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            // If searching, ensure all sections are visible so cards can be found
+            if(input.length > 0) {
+                document.querySelectorAll('.category-section').forEach(sec => sec.style.display = 'block');
+            }
+        }
+
+        // Mod Sniper Link Logic
+        function copyLink(id, btnElement) {
+            // Build the URL
+            const url = window.location.href.split('#')[0] + '#' + id;
+            
+            navigator.clipboard.writeText(url).then(() => {
+                const originalText = btnElement.innerText;
+                const originalClasses = btnElement.className;
+                
+                // Visual feedback
+                btnElement.innerText = "✅ Copied!";
+                btnElement.classList.add('bg-green-600', 'text-white', 'border-green-500');
+                btnElement.classList.remove('bg-spider-dark', 'text-spider-text');
+                
+                setTimeout(() => {
+                    btnElement.innerText = originalText;
+                    btnElement.className = originalClasses;
+                }, 2000);
+            });
+        }
+
+        // On Load: Check if a user clicked a Mod Sniper Link
+        window.onload = function() {
+            if(window.location.hash) {
+                const id = window.location.hash.substring(1);
+                const targetElement = document.getElementById(id);
+                
+                if (targetElement) {
+                    // Make sure the section is visible
+                    const parentSection = targetElement.closest('.category-section');
+                    showCategory(parentSection.id);
+                    
+                    // Add the glowing red pulse animation
+                    targetElement.classList.add('targeted');
+                    
+                    // Smooth scroll to it, leaving some space at the top for the sticky header
+                    setTimeout(() => {
+                        const y = targetElement.getBoundingClientRect().top + window.scrollY - 100;
+                        window.scrollTo({top: y, behavior: 'smooth'});
+                    }, 300);
+                    
+                    // Remove the animation after 6 seconds so it doesn't get annoying
+                    setTimeout(() => {
+                        targetElement.classList.remove('targeted');
+                    }, 6000);
+                }
+            }
+        };
+    </script>
+</body>
+</html>
