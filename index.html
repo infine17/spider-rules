@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spider's Web | Official Rulebook & Directory</title>
+    <title>Spider's Web | Official Rulebook</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     
     <script>
         tailwind.config = {
@@ -13,16 +13,19 @@
                 extend: {
                     colors: {
                         spider: {
-                            dark: '#0a0a0c',
-                            panel: '#13151a',
-                            border: '#1f2430',
+                            black: '#000000',
+                            panel: 'rgba(10, 15, 30, 0.6)', /* Glass dark blue/black */
+                            border: 'rgba(37, 99, 235, 0.4)', /* Dark blue border */
                             red: '#e62429',
-                            redglow: 'rgba(230, 36, 41, 0.5)',
-                            text: '#a1a1aa'
+                            darkred: '#991b1b',
+                            blue: '#2563eb',
+                            lightblue: '#60a5fa',
+                            text: '#cbd5e1'
                         }
                     },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif'],
                     }
                 }
             }
@@ -31,25 +34,60 @@
 
     <style>
         body {
-            background-color: #0a0a0c;
-            color: #f4f4f5;
-            /* Subtle web-like dot pattern */
-            background-image: radial-gradient(#1f2430 1px, transparent 1px);
-            background-size: 20px 20px;
+            background-color: #000000;
+            color: #f8fafc;
+            margin: 0;
+            overflow-x: hidden;
             scroll-behavior: smooth;
         }
 
-        /* Custom Scrollbar */
+        /* Fixed Canvas Background */
+        #webCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none; /* Let clicks pass through to the site */
+        }
+
+        /* Custom Scrollbar - Red & Blue */
         ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #0a0a0c; }
-        ::-webkit-scrollbar-thumb { background: #1f2430; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #e62429; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { 
+            background: linear-gradient(to bottom, #2563eb, #e62429); 
+            border-radius: 4px; 
+        }
+
+        /* Glassmorphism Cards */
+        .glass-card {
+            background: var(--spider-panel);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(37, 99, 235, 0.2);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px) scale(1.01);
+            border-color: rgba(230, 36, 41, 0.6);
+            box-shadow: 0 10px 30px -10px rgba(230, 36, 41, 0.4), 
+                        0 0 20px -5px rgba(37, 99, 235, 0.4);
+        }
+
+        /* Text Gradients */
+        .text-gradient {
+            background: linear-gradient(135deg, #60a5fa, #e62429);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
         /* The Sniper Highlight Animation */
         @keyframes target-pulse {
             0% { box-shadow: 0 0 0 0 rgba(230, 36, 41, 0.7); border-color: #e62429; }
-            70% { box-shadow: 0 0 0 15px rgba(230, 36, 41, 0); border-color: #e62429; }
-            100% { box-shadow: 0 0 0 0 rgba(230, 36, 41, 0); border-color: #1f2430; }
+            70% { box-shadow: 0 0 0 15px rgba(230, 36, 41, 0); border-color: #2563eb; }
+            100% { box-shadow: 0 0 0 0 rgba(230, 36, 41, 0); border-color: rgba(37, 99, 235, 0.2); }
         }
         
         .targeted {
@@ -63,353 +101,312 @@
         details > summary { list-style: none; }
         details > summary::-webkit-details-marker { display: none; }
         
-        /* Card Hover Effects */
-        .info-card { transition: all 0.3s ease; }
-        .info-card:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        .nav-btn.active {
+            background: linear-gradient(135deg, #991b1b, #e62429);
+            border-color: #e62429;
+            color: white;
+            box-shadow: 0 0 15px rgba(230, 36, 41, 0.4);
+        }
     </style>
 </head>
 <body class="font-sans antialiased min-h-screen pb-20">
 
-    <header class="bg-spider-panel border-b border-spider-border sticky top-0 z-50 shadow-2xl">
-        <div class="max-w-6xl mx-auto px-4 py-6">
+    <!-- The Animated Web Background -->
+    <canvas id="webCanvas"></canvas>
+
+    <header class="sticky top-0 z-50 glass-card border-b-0 border-spider-blue/30 shadow-[0_4px_30px_rgba(0,0,0,0.5)]">
+        <div class="max-w-6xl mx-auto px-4 py-5">
             <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-                <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 bg-spider-red rounded-full flex items-center justify-center text-2xl shadow-[0_0_15px_rgba(230,36,41,0.5)]">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-full bg-gradient-to-br from-spider-blue to-spider-red flex items-center justify-center text-2xl shadow-[0_0_20px_rgba(230,36,41,0.6)]">
                         🕷️
                     </div>
                     <div>
-                        <h1 class="text-2xl font-extrabold tracking-tight text-white uppercase">Spider's Web</h1>
-                        <p class="text-xs text-spider-text tracking-widest uppercase">Official Community Directory</p>
+                        <h1 class="text-3xl font-display font-bold tracking-tight uppercase text-gradient">Spider's Web</h1>
+                        <p class="text-xs text-spider-text tracking-[0.2em] uppercase font-semibold">Official Directory</p>
                     </div>
                 </div>
                 
-                <div class="w-full md:w-96 relative">
+                <div class="w-full md:w-96 relative group">
+                    <div class="absolute inset-0 bg-gradient-to-r from-spider-blue to-spider-red rounded-lg blur opacity-25 group-hover:opacity-50 transition duration-500"></div>
                     <input type="text" id="searchBar" onkeyup="searchContent()" placeholder="🔍 Search rules, roles, levels..." 
-                           class="w-full bg-spider-dark border border-spider-border text-white px-4 py-3 rounded-lg focus:outline-none focus:border-spider-red focus:ring-1 focus:ring-spider-red transition">
+                           class="relative w-full bg-black/50 backdrop-blur-sm border border-spider-border text-white px-4 py-3 rounded-lg focus:outline-none focus:border-spider-red focus:ring-1 focus:ring-spider-red transition placeholder-gray-500">
                 </div>
             </div>
 
-            <nav class="flex overflow-x-auto gap-2 mt-6 pb-2 hide-scrollbar">
-                <button onclick="showCategory('all')" class="nav-btn px-4 py-2 bg-spider-red text-white font-semibold rounded-md whitespace-nowrap transition" id="btn-all">All</button>
-                <button onclick="showCategory('chat-rules')" class="nav-btn px-4 py-2 bg-spider-dark border border-spider-border hover:border-spider-text text-spider-text rounded-md whitespace-nowrap transition" id="btn-chat-rules">Chat Rules</button>
-                <button onclick="showCategory('community-rules')" class="nav-btn px-4 py-2 bg-spider-dark border border-spider-border hover:border-spider-text text-spider-text rounded-md whitespace-nowrap transition" id="btn-community-rules">Community Rules</button>
-                <button onclick="showCategory('staff')" class="nav-btn px-4 py-2 bg-spider-dark border border-spider-border hover:border-spider-text text-spider-text rounded-md whitespace-nowrap transition" id="btn-staff">Staff Structure</button>
-                <button onclick="showCategory('roles')" class="nav-btn px-4 py-2 bg-spider-dark border border-spider-border hover:border-spider-text text-spider-text rounded-md whitespace-nowrap transition" id="btn-roles">Special Roles</button>
-                <button onclick="showCategory('levels')" class="nav-btn px-4 py-2 bg-spider-dark border border-spider-border hover:border-spider-text text-spider-text rounded-md whitespace-nowrap transition" id="btn-levels">Level Rewards</button>
+            <nav class="flex overflow-x-auto gap-3 mt-6 pb-2 hide-scrollbar">
+                <button onclick="showCategory('all', this)" class="nav-btn active px-5 py-2 border border-spider-border text-spider-text hover:text-white font-semibold rounded-md whitespace-nowrap transition bg-black/50">All</button>
+                <button onclick="showCategory('chat-rules', this)" class="nav-btn px-5 py-2 border border-spider-border text-spider-text hover:text-white font-semibold rounded-md whitespace-nowrap transition bg-black/50">Chat Rules</button>
+                <button onclick="showCategory('community-rules', this)" class="nav-btn px-5 py-2 border border-spider-border text-spider-text hover:text-white font-semibold rounded-md whitespace-nowrap transition bg-black/50">Community Rules</button>
+                <button onclick="showCategory('staff', this)" class="nav-btn px-5 py-2 border border-spider-border text-spider-text hover:text-white font-semibold rounded-md whitespace-nowrap transition bg-black/50">Staff Structure</button>
+                <button onclick="showCategory('roles', this)" class="nav-btn px-5 py-2 border border-spider-border text-spider-text hover:text-white font-semibold rounded-md whitespace-nowrap transition bg-black/50">Special Roles</button>
+                <button onclick="showCategory('levels', this)" class="nav-btn px-5 py-2 border border-spider-border text-spider-text hover:text-white font-semibold rounded-md whitespace-nowrap transition bg-black/50">Level Rewards</button>
             </nav>
         </div>
     </header>
 
-    <main class="max-w-6xl mx-auto px-4 mt-10 space-y-16" id="main-content">
+    <main class="max-w-6xl mx-auto px-4 mt-12 space-y-20 relative z-10" id="main-content">
 
         <section id="chat-rules" class="category-section">
-            <div class="mb-6 border-b border-spider-border pb-2">
-                <h2 class="text-3xl font-bold text-white flex items-center gap-2"><span class="text-spider-red">|</span> Chat Rules</h2>
-                <p class="text-spider-text mt-1">We want everyone to enjoy themselves and feel welcome here. Please abide by these rules.</p>
+            <div class="mb-8 flex items-end gap-4 border-b border-spider-border/50 pb-4">
+                <h2 class="text-4xl font-display font-bold text-white"><span class="text-spider-red">01.</span> Chat Rules</h2>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="info-card bg-spider-panel border border-spider-border border-l-4 border-l-spider-red rounded-lg p-6 relative" id="article-1">
+                <div class="info-card glass-card rounded-xl p-6 relative border-l-4 border-l-spider-blue hover:border-l-spider-red" id="article-1">
                     <div class="flex justify-between items-start mb-4">
-                        <h3 class="text-xl font-bold text-white">Article 1: Civil Behaviour</h3>
-                        <button onclick="copyLink('article-1', this)" class="text-xs bg-spider-dark hover:bg-spider-red text-spider-text hover:text-white px-3 py-1 rounded transition border border-spider-border">🔗 Copy Link</button>
+                        <h3 class="text-xl font-bold text-white font-display">Article 1: Civil Behaviour</h3>
+                        <button onclick="copyLink('article-1', this)" class="text-xs bg-black hover:bg-spider-red text-spider-text hover:text-white px-3 py-1.5 rounded transition border border-spider-border">🔗 Sniper Link</button>
                     </div>
                     <ul class="space-y-3 text-sm text-gray-300">
-                        <li><strong class="text-spider-red">1.1</strong> Avoid bombarding the chat with too many emojis, repeated messages, or level-up attempts.</li>
-                        <li><strong class="text-spider-red">1.2</strong> Don't post links anywhere on the server or promote yourself or others.</li>
-                        <li><strong class="text-spider-red">1.3</strong> Greet and engage new members. Avoid being impolite, eerie, or violent. Use correct display names (no forced nicknames).</li>
-                        <li><strong class="text-spider-red">1.4</strong> Show respect for staff. No offensive names/PFPs (staff may alter them at any time).</li>
-                        <li><strong class="text-spider-red">1.5</strong> Never share someone else's pictures or personal info without consent.</li>
+                        <li><strong class="text-spider-blue">1.1</strong> Avoid bombarding the chat with too many emojis, repeated messages, or level-up attempts.</li>
+                        <li><strong class="text-spider-blue">1.2</strong> Don't post links anywhere on the server or promote yourself or others.</li>
+                        <li><strong class="text-spider-blue">1.3</strong> Greet and engage new members. Avoid being impolite, eerie, or violent. Use correct display names.</li>
+                        <li><strong class="text-spider-blue">1.4</strong> Show respect for staff. No offensive names/PFPs (staff may alter them at any time).</li>
+                        <li><strong class="text-spider-blue">1.5</strong> Never share someone else's pictures or personal info without consent.</li>
                     </ul>
-                    <details class="mt-4 bg-spider-dark p-3 rounded-md cursor-pointer group border border-spider-border">
-                        <summary class="text-spider-text font-semibold outline-none group-open:text-spider-red transition">Edge Case: "I was just joking around!"</summary>
-                        <p class="text-gray-400 text-xs mt-2 border-l-2 border-spider-red pl-2">Intent does not matter if the behavior disrupts the chat or makes others uncomfortable. Staff discretion applies.</p>
+                    <details class="mt-5 bg-black/40 p-3 rounded-lg cursor-pointer group border border-spider-border/50 hover:border-spider-red transition">
+                        <summary class="text-spider-text font-semibold outline-none group-open:text-spider-red transition flex justify-between items-center text-sm">
+                            <span>Edge Case: "I was just joking around!"</span>
+                            <span class="text-xs">▼</span>
+                        </summary>
+                        <p class="text-gray-400 text-xs mt-3 border-l-2 border-spider-red pl-3">Intent does not matter if the behavior disrupts the chat or makes others uncomfortable. Staff discretion applies 100% of the time.</p>
                     </details>
                 </div>
 
-                <div class="info-card bg-spider-panel border border-spider-border border-l-4 border-l-spider-red rounded-lg p-6 relative" id="article-2">
+                <div class="info-card glass-card rounded-xl p-6 relative border-l-4 border-l-spider-blue hover:border-l-spider-red" id="article-2">
                     <div class="flex justify-between items-start mb-4">
-                        <h3 class="text-xl font-bold text-white">Article 2: Following Instructions</h3>
-                        <button onclick="copyLink('article-2', this)" class="text-xs bg-spider-dark hover:bg-spider-red text-spider-text hover:text-white px-3 py-1 rounded transition border border-spider-border">🔗 Copy Link</button>
+                        <h3 class="text-xl font-bold text-white font-display">Article 2: Following Instructions</h3>
+                        <button onclick="copyLink('article-2', this)" class="text-xs bg-black hover:bg-spider-red text-spider-text hover:text-white px-3 py-1.5 rounded transition border border-spider-border">🔗 Sniper Link</button>
                     </div>
                     <ul class="space-y-3 text-sm text-gray-300">
-                        <li><strong class="text-spider-red">2.1</strong> You must change the topic if a staff member requests it. Noncompliance leads to kick/ban.</li>
-                        <li><strong class="text-spider-red">2.2</strong> Avoid tagging staff members unless it's for a significant occasion.</li>
-                        <li><strong class="text-spider-red">2.3</strong> Avoid arguing with moderators or staff. Their choices are final.</li>
+                        <li><strong class="text-spider-blue">2.1</strong> You must change the topic if a staff member requests it. Noncompliance leads to kick/ban.</li>
+                        <li><strong class="text-spider-blue">2.2</strong> Avoid tagging staff members unless it's for a significant occasion.</li>
+                        <li><strong class="text-spider-blue">2.3</strong> Avoid arguing with moderators or staff. Their choices are final.</li>
                     </ul>
                 </div>
 
-                <div class="info-card bg-spider-panel border border-spider-border border-l-4 border-l-spider-red rounded-lg p-6 relative" id="article-3">
+                <div class="info-card glass-card rounded-xl p-6 relative border-l-4 border-l-spider-blue hover:border-l-spider-red" id="article-3">
                     <div class="flex justify-between items-start mb-4">
-                        <h3 class="text-xl font-bold text-white">Article 3: Conflict Resolution</h3>
-                        <button onclick="copyLink('article-3', this)" class="text-xs bg-spider-dark hover:bg-spider-red text-spider-text hover:text-white px-3 py-1 rounded transition border border-spider-border">🔗 Copy Link</button>
+                        <h3 class="text-xl font-bold text-white font-display">Article 3: Conflict Resolution</h3>
+                        <button onclick="copyLink('article-3', this)" class="text-xs bg-black hover:bg-spider-red text-spider-text hover:text-white px-3 py-1.5 rounded transition border border-spider-border">🔗 Sniper Link</button>
                     </div>
                     <ul class="space-y-3 text-sm text-gray-300">
-                        <li><strong class="text-spider-red">3.1</strong> Blocking and moving on is the best course of action when someone is bothering you.</li>
-                        <li><strong class="text-spider-red">3.2</strong> It is assumed that you possess the common sense to recognise sarcasm and puns.</li>
+                        <li><strong class="text-spider-blue">3.1</strong> Blocking and moving on is the best course of action when someone is bothering you.</li>
+                        <li><strong class="text-spider-blue">3.2</strong> It is assumed that you possess the common sense to recognise sarcasm and puns. Don't weaponize reports over jokes.</li>
                     </ul>
                 </div>
             </div>
         </section>
 
         <section id="community-rules" class="category-section">
-            <div class="mb-6 border-b border-spider-border pb-2">
-                <h2 class="text-3xl font-bold text-white flex items-center gap-2"><span class="text-spider-red">|</span> Community Rules</h2>
-                <p class="text-spider-text mt-1 text-sm bg-spider-dark p-3 rounded border border-spider-border inline-block">⚠️ The spirit of the rule is more important than its exact wording. Moderators have the last word.</p>
+            <div class="mb-8 flex items-end gap-4 border-b border-spider-border/50 pb-4">
+                <h2 class="text-4xl font-display font-bold text-white"><span class="text-spider-red">02.</span> Community Rules</h2>
+            </div>
+            
+            <div class="mb-6 bg-spider-red/10 border border-spider-red/30 p-4 rounded-lg flex gap-3 items-center">
+                <span class="text-2xl">⚠️</span>
+                <p class="text-sm text-spider-text font-medium"><strong class="text-white">The spirit of the rule is more important than its exact wording.</strong> Moderators have the last word. Pushing the boundaries of rules on purpose will result in action.</p>
             </div>
 
-            <div class="grid grid-cols-1 gap-4">
-                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-5 flex flex-col md:flex-row gap-4" id="rule-1">
-                    <div class="flex-shrink-0 text-3xl font-black text-spider-border">01</div>
-                    <div class="flex-grow">
+            <div class="grid grid-cols-1 gap-5">
+                <div class="info-card glass-card rounded-xl p-5 flex flex-col md:flex-row gap-5 items-center" id="rule-1">
+                    <div class="flex-shrink-0 text-5xl font-display font-black text-transparent bg-clip-text bg-gradient-to-b from-spider-border to-transparent opacity-50 pl-2">01</div>
+                    <div class="flex-grow w-full">
                         <div class="flex justify-between items-start">
                             <h3 class="text-lg font-bold text-white">Follow Discord Terms of Service</h3>
-                            <button onclick="copyLink('rule-1', this)" class="text-xs bg-spider-dark hover:bg-spider-red text-spider-text hover:text-white px-2 py-1 rounded transition">🔗 Copy</button>
+                            <button onclick="copyLink('rule-1', this)" class="text-xs bg-black text-spider-text hover:text-white hover:bg-spider-red px-2 py-1 rounded transition border border-spider-border">🔗 Snipe</button>
                         </div>
                         <p class="text-sm text-gray-300 mt-1">Abide by Discord guidelines. Violation can result in severe action, including permanent removal.</p>
                     </div>
                 </div>
 
-                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-5 flex flex-col md:flex-row gap-4" id="rule-2">
-                    <div class="flex-shrink-0 text-3xl font-black text-spider-border">02</div>
-                    <div class="flex-grow">
+                <div class="info-card glass-card rounded-xl p-5 flex flex-col md:flex-row gap-5 items-center" id="rule-2">
+                    <div class="flex-shrink-0 text-5xl font-display font-black text-transparent bg-clip-text bg-gradient-to-b from-spider-border to-transparent opacity-50 pl-2">02</div>
+                    <div class="flex-grow w-full">
                         <div class="flex justify-between items-start">
-                            <h3 class="text-lg font-bold text-white">Keep Content Appropriate for All Ages</h3>
-                            <button onclick="copyLink('rule-2', this)" class="text-xs bg-spider-dark hover:bg-spider-red text-spider-text hover:text-white px-2 py-1 rounded transition">🔗 Copy</button>
+                            <h3 class="text-lg font-bold text-white">Appropriate Content</h3>
+                            <button onclick="copyLink('rule-2', this)" class="text-xs bg-black text-spider-text hover:text-white hover:bg-spider-red px-2 py-1 rounded transition border border-spider-border">🔗 Snipe</button>
                         </div>
                         <p class="text-sm text-gray-300 mt-1">No NSFW content (extreme violence, self-harm, explicit sexual content). Discussion related to such content must not share explicit media.</p>
-                        <details class="mt-3 bg-spider-dark p-2 rounded cursor-pointer group text-xs border border-spider-border">
-                            <summary class="text-spider-text font-semibold outline-none group-open:text-spider-red">Edge Case: "It was just a meme/art!"</summary>
-                            <p class="text-gray-400 mt-2">Drawn art, anime, or "joke" images that depict sexually explicit acts or extreme gore are still heavily strictly prohibited.</p>
+                        <details class="mt-3 bg-black/40 p-2.5 rounded-lg cursor-pointer group text-xs border border-spider-border/50 hover:border-spider-red transition">
+                            <summary class="text-spider-text font-semibold outline-none group-open:text-spider-red flex justify-between items-center">
+                                <span>Edge Case: "It was just a meme/anime!"</span>
+                                <span>▼</span>
+                            </summary>
+                            <p class="text-gray-400 mt-2 border-l-2 border-spider-red pl-2">Drawn art, anime, or "joke" images that depict sexually explicit acts or extreme gore are heavily strictly prohibited. Context does not save you here.</p>
                         </details>
                     </div>
                 </div>
 
-                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-5 flex flex-col md:flex-row gap-4" id="rule-3">
-                    <div class="flex-shrink-0 text-3xl font-black text-spider-border">03</div>
-                    <div class="flex-grow">
+                <div class="info-card glass-card rounded-xl p-5 flex flex-col md:flex-row gap-5 items-center" id="rule-3">
+                    <div class="flex-shrink-0 text-5xl font-display font-black text-transparent bg-clip-text bg-gradient-to-b from-spider-border to-transparent opacity-50 pl-2">03</div>
+                    <div class="flex-grow w-full">
                         <div class="flex justify-between items-start">
-                            <h3 class="text-lg font-bold text-white">Good Attitude & Respect Staff</h3>
-                            <button onclick="copyLink('rule-3', this)" class="text-xs bg-spider-dark hover:bg-spider-red text-spider-text hover:text-white px-2 py-1 rounded transition">🔗 Copy</button>
+                            <h3 class="text-lg font-bold text-white">Respect Server Staff</h3>
+                            <button onclick="copyLink('rule-3', this)" class="text-xs bg-black text-spider-text hover:text-white hover:bg-spider-red px-2 py-1 rounded transition border border-spider-border">🔗 Snipe</button>
                         </div>
-                        <p class="text-sm text-gray-300 mt-1">Be respectful. Disruptive/aggressive behavior is not tolerated. Address mod actions in tickets, NOT in public channels. Evading punishments leads to bans.</p>
+                        <p class="text-sm text-gray-300 mt-1">Disruptive/aggressive behavior is not tolerated. Address mod actions in tickets, NOT in public channels. Evading punishments leads to instant bans.</p>
                     </div>
                 </div>
 
-                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-5 flex flex-col md:flex-row gap-4" id="rule-4">
-                    <div class="flex-shrink-0 text-3xl font-black text-spider-border">04</div>
-                    <div class="flex-grow">
+                <div class="info-card glass-card rounded-xl p-5 flex flex-col md:flex-row gap-5 items-center" id="rule-4">
+                    <div class="flex-shrink-0 text-5xl font-display font-black text-transparent bg-clip-text bg-gradient-to-b from-spider-border to-transparent opacity-50 pl-2">04</div>
+                    <div class="flex-grow w-full">
                         <div class="flex justify-between items-start">
-                            <h3 class="text-lg font-bold text-white">Speak Hinglish & Follow Channel Rules</h3>
-                            <button onclick="copyLink('rule-4', this)" class="text-xs bg-spider-dark hover:bg-spider-red text-spider-text hover:text-white px-2 py-1 rounded transition">🔗 Copy</button>
+                            <h3 class="text-lg font-bold text-white">Speak Hinglish</h3>
+                            <button onclick="copyLink('rule-4', this)" class="text-xs bg-black text-spider-text hover:text-white hover:bg-spider-red px-2 py-1 rounded transition border border-spider-border">🔗 Snipe</button>
                         </div>
                         <p class="text-sm text-gray-300 mt-1">Official language is Hinglish (scriptures in English) so everyone understands. Read channel pins as some channels have specific exemptions/rules.</p>
                     </div>
                 </div>
 
-                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-5 flex flex-col md:flex-row gap-4" id="rule-5">
-                    <div class="flex-shrink-0 text-3xl font-black text-spider-border">05</div>
-                    <div class="flex-grow">
+                <div class="info-card glass-card rounded-xl p-5 flex flex-col md:flex-row gap-5 items-center" id="rule-5">
+                    <div class="flex-shrink-0 text-5xl font-display font-black text-transparent bg-clip-text bg-gradient-to-b from-spider-border to-transparent opacity-50 pl-2">05</div>
+                    <div class="flex-grow w-full">
                         <div class="flex justify-between items-start">
                             <h3 class="text-lg font-bold text-white">No Spam or Advertising</h3>
-                            <button onclick="copyLink('rule-5', this)" class="text-xs bg-spider-dark hover:bg-spider-red text-spider-text hover:text-white px-2 py-1 rounded transition">🔗 Copy</button>
+                            <button onclick="copyLink('rule-5', this)" class="text-xs bg-black text-spider-text hover:text-white hover:bg-spider-red px-2 py-1 rounded transition border border-spider-border">🔗 Snipe</button>
                         </div>
-                        <p class="text-sm text-gray-300 mt-1">No disruptive self-promotion, duplicate messages, wall-texts, or excessive pings/emojis. Selling server growth methods or posting scams results in an instant ban.</p>
+                        <p class="text-sm text-gray-300 mt-1">No disruptive self-promotion, duplicate messages, or wall-texts. Selling server growth methods or posting scams results in an instant ban.</p>
                     </div>
                 </div>
 
-                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-5 flex flex-col md:flex-row gap-4" id="rule-6">
-                    <div class="flex-shrink-0 text-3xl font-black text-spider-border">06</div>
-                    <div class="flex-grow">
-                        <div class="flex justify-between items-start">
-                            <h3 class="text-lg font-bold text-white">Respect Others' Privacy</h3>
-                            <button onclick="copyLink('rule-6', this)" class="text-xs bg-spider-dark hover:bg-spider-red text-spider-text hover:text-white px-2 py-1 rounded transition">🔗 Copy</button>
-                        </div>
-                        <p class="text-sm text-gray-300 mt-1">Do not share real names, addresses, or other social media accounts without permission. Doxxing leads to immediate removal.</p>
-                    </div>
-                </div>
-
-                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-5 flex flex-col md:flex-row gap-4" id="rule-7">
-                    <div class="flex-shrink-0 text-3xl font-black text-spider-border">07</div>
-                    <div class="flex-grow">
-                        <div class="flex justify-between items-start">
-                            <h3 class="text-lg font-bold text-white">Profile Criteria</h3>
-                            <button onclick="copyLink('rule-7', this)" class="text-xs bg-spider-dark hover:bg-spider-red text-spider-text hover:text-white px-2 py-1 rounded transition">🔗 Copy</button>
-                        </div>
-                        <p class="text-sm text-gray-300 mt-1">No unreadable/disruptive names. No impersonation of others. We will moderate default user profiles if they violate server rules.</p>
-                    </div>
-                </div>
-
-                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-5 flex flex-col md:flex-row gap-4" id="rule-8">
-                    <div class="flex-shrink-0 text-3xl font-black text-spider-border">08</div>
-                    <div class="flex-grow">
+                <div class="info-card glass-card rounded-xl p-5 flex flex-col md:flex-row gap-5 items-center" id="rule-8">
+                    <div class="flex-shrink-0 text-5xl font-display font-black text-transparent bg-clip-text bg-gradient-to-b from-spider-border to-transparent opacity-50 pl-2">08</div>
+                    <div class="flex-grow w-full">
                         <div class="flex justify-between items-start">
                             <h3 class="text-lg font-bold text-white">No Hate Speech or Sensitive Topics</h3>
-                            <button onclick="copyLink('rule-8', this)" class="text-xs bg-spider-dark hover:bg-spider-red text-spider-text hover:text-white px-2 py-1 rounded transition">🔗 Copy</button>
+                            <button onclick="copyLink('rule-8', this)" class="text-xs bg-black text-spider-text hover:text-white hover:bg-spider-red px-2 py-1 rounded transition border border-spider-border">🔗 Snipe</button>
                         </div>
                         <p class="text-sm text-gray-300 mt-1">Discrimination, hate speech, or debates on politics, religion, violence, or regulated goods are forbidden. Report suspicious DMs to staff immediately.</p>
-                    </div>
-                </div>
-
-                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-5 flex flex-col md:flex-row gap-4" id="rule-9-10">
-                    <div class="flex-shrink-0 text-3xl font-black text-spider-border">09</div>
-                    <div class="flex-grow">
-                        <div class="flex justify-between items-start">
-                            <h3 class="text-lg font-bold text-white">Staff Intervention & Media Spam</h3>
-                            <button onclick="copyLink('rule-9-10', this)" class="text-xs bg-spider-dark hover:bg-spider-red text-spider-text hover:text-white px-2 py-1 rounded transition">🔗 Copy</button>
-                        </div>
-                        <p class="text-sm text-gray-300 mt-1">If staff are pinged for suspicious VC activity, they may join to investigate. Spamming videos, GIFs, or images is prohibited.</p>
-                        <p class="text-xs text-spider-red mt-2 font-bold">To contest a warning, ping @Staff Team or open a ticket and INCLUDE YOUR CASE ID.</p>
                     </div>
                 </div>
             </div>
         </section>
 
         <section id="staff" class="category-section">
-            <div class="mb-6 border-b border-spider-border pb-2">
-                <h2 class="text-3xl font-bold text-white flex items-center gap-2"><span class="text-spider-red">|</span> Staff Structure</h2>
-                <p class="text-spider-text mt-1">The backbone of our team keeping the community safe and welcoming.</p>
+            <div class="mb-8 flex items-end gap-4 border-b border-spider-border/50 pb-4">
+                <h2 class="text-4xl font-display font-bold text-white"><span class="text-spider-red">03.</span> Staff Structure</h2>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                 
-                <div class="info-card bg-spider-panel border border-spider-red rounded-lg p-5 text-center relative overflow-hidden" id="role-senpai">
-                    <div class="absolute top-0 left-0 w-full h-1 bg-spider-red"></div>
-                    <div class="text-4xl mb-2">🕷️</div>
-                    <h3 class="text-lg font-bold text-white">Senpai Spider</h3>
-                    <p class="text-xs text-spider-red font-bold uppercase tracking-wider mb-2">Founder</p>
-                    <p class="text-sm text-gray-400">The special leadership and founder role who stands at the very top of the community.</p>
-                    <button onclick="copyLink('role-senpai', this)" class="mt-3 text-xs bg-spider-dark text-spider-text px-2 py-1 rounded">🔗 Copy</button>
+                <div class="info-card glass-card rounded-xl p-6 text-center relative overflow-hidden group border-spider-red/50 shadow-[0_0_30px_rgba(230,36,41,0.15)]" id="role-senpai">
+                    <div class="absolute inset-0 bg-gradient-to-b from-spider-red/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div class="text-5xl mb-3 relative z-10 drop-shadow-[0_0_15px_rgba(230,36,41,0.8)]">🕷️</div>
+                    <h3 class="text-xl font-display font-bold text-white relative z-10">Senpai Spider</h3>
+                    <p class="text-xs text-spider-red font-bold uppercase tracking-widest mb-3 relative z-10">Founder</p>
+                    <p class="text-sm text-gray-300 relative z-10">The special leadership and founder role who stands at the very top of the community.</p>
                 </div>
 
-                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-5 text-center" id="role-manager">
-                    <div class="text-4xl mb-2">👑</div>
-                    <h3 class="text-lg font-bold text-white">The Manager (Ojas)</h3>
-                    <p class="text-sm text-gray-400 mt-2">Responsible for overseeing all teams and ensuring smooth server operations.</p>
-                    <button onclick="copyLink('role-manager', this)" class="mt-3 text-xs bg-spider-dark text-spider-text px-2 py-1 rounded">🔗 Copy</button>
+                <div class="info-card glass-card rounded-xl p-6 text-center relative group" id="role-manager">
+                    <div class="text-5xl mb-3 drop-shadow-[0_0_15px_rgba(96,165,250,0.5)]">👑</div>
+                    <h3 class="text-xl font-display font-bold text-white">The Manager</h3>
+                    <p class="text-xs text-spider-blue font-bold uppercase tracking-widest mb-3">Ojas</p>
+                    <p class="text-sm text-gray-300">Responsible for overseeing all teams and ensuring smooth server operations.</p>
                 </div>
 
-                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-5 text-center" id="role-exec">
-                    <div class="text-4xl mb-2">👔</div>
-                    <h3 class="text-lg font-bold text-white">Executive Team</h3>
-                    <p class="text-sm text-gray-400 mt-2">Senior staff who guide departments, make major decisions, and coordinate all staff activities.</p>
-                    <button onclick="copyLink('role-exec', this)" class="mt-3 text-xs bg-spider-dark text-spider-text px-2 py-1 rounded">🔗 Copy</button>
+                <div class="info-card glass-card rounded-xl p-6 text-center group" id="role-exec">
+                    <div class="text-5xl mb-3">👔</div>
+                    <h3 class="text-xl font-display font-bold text-white">Executive Team</h3>
+                    <p class="text-sm text-gray-300 mt-2">Senior staff who guide departments, make major decisions, and coordinate all staff activities.</p>
                 </div>
 
-                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-5 text-center" id="role-mod">
-                    <div class="text-4xl mb-2">🛡️</div>
-                    <h3 class="text-lg font-bold text-white">Moderators</h3>
-                    <p class="text-sm text-gray-400 mt-2">The active enforcers who maintain chats, keep discussions healthy, and apply rules fairly.</p>
+                <div class="info-card glass-card rounded-xl p-6 text-center group" id="role-mod">
+                    <div class="text-5xl mb-3">🛡️</div>
+                    <h3 class="text-xl font-display font-bold text-white">Moderators</h3>
+                    <p class="text-sm text-gray-300 mt-2">The active enforcers who maintain chats, keep discussions healthy, and apply rules fairly.</p>
                 </div>
 
-                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-5 text-center" id="role-trial">
-                    <div class="text-4xl mb-2">🔰</div>
-                    <h3 class="text-lg font-bold text-white">Trial Moderators</h3>
-                    <p class="text-sm text-gray-400 mt-2">New staff members learning the ropes, preparing to become full moderators.</p>
+                <div class="info-card glass-card rounded-xl p-6 text-center group" id="role-trial">
+                    <div class="text-5xl mb-3">🔰</div>
+                    <h3 class="text-xl font-display font-bold text-white">Trial Moderators</h3>
+                    <p class="text-sm text-gray-300 mt-2">New staff members learning the ropes, preparing to become full moderators.</p>
                 </div>
 
-                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-5 text-center" id="role-vc">
-                    <div class="text-4xl mb-2">🎙️</div>
-                    <h3 class="text-lg font-bold text-white">VC Department</h3>
-                    <p class="text-sm text-gray-400 mt-2">Dedicated to managing voice channels, making sure voice chats stay friendly and organized.</p>
-                </div>
-
-                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-5 text-center" id="role-ticket-mgr">
-                    <div class="text-4xl mb-2">🎫</div>
-                    <h3 class="text-lg font-bold text-white">Ticket Manager</h3>
-                    <p class="text-sm text-gray-400 mt-2">Handles the ticket system, ensuring member issues and requests are resolved quickly.</p>
-                </div>
-
-                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-5 text-center sm:col-span-2 lg:col-span-2" id="role-ticket-dept">
-                    <div class="text-4xl mb-2">📨</div>
-                    <h3 class="text-lg font-bold text-white">Ticket Department</h3>
-                    <p class="text-sm text-gray-400 mt-2">A team dedicated to working together on tickets, providing support to the community whenever needed.</p>
+                <div class="info-card glass-card rounded-xl p-6 text-center group" id="role-vc">
+                    <div class="text-5xl mb-3">🎙️</div>
+                    <h3 class="text-xl font-display font-bold text-white">VC Department</h3>
+                    <p class="text-sm text-gray-300 mt-2">Dedicated to managing voice channels, making sure voice chats stay friendly and organized.</p>
                 </div>
 
             </div>
         </section>
 
         <section id="roles" class="category-section">
-            <div class="mb-6 border-b border-spider-border pb-2">
-                <h2 class="text-3xl font-bold text-white flex items-center gap-2"><span class="text-spider-red">|</span> Special Roles</h2>
-                <p class="text-spider-text mt-1">Unique roles and what they represent in our community.</p>
+            <div class="mb-8 flex items-end gap-4 border-b border-spider-border/50 pb-4">
+                <h2 class="text-4xl font-display font-bold text-white"><span class="text-spider-red">04.</span> Special Roles</h2>
             </div>
 
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                <div class="info-card bg-spider-panel border border-spider-border rounded p-4" id="spec-bff"><div class="font-bold text-white">🤝 Best Friends</div><div class="text-xs text-gray-400 mt-1">Senpai's closest companions.</div></div>
-                <div class="info-card bg-spider-panel border border-spider-border rounded p-4" id="spec-apex"><div class="font-bold text-yellow-400">🏆 The Apex Spiders</div><div class="text-xs text-gray-400 mt-1">Great achievers of the last year.</div></div>
-                <div class="info-card bg-spider-panel border border-spider-border rounded p-4" id="spec-bots"><div class="font-bold text-blue-400">🤖 Partnered Bots</div><div class="text-xs text-gray-400 mt-1">Official server bots.</div></div>
-                <div class="info-card bg-spider-panel border border-spider-border rounded p-4" id="spec-guest"><div class="font-bold text-white">🎫 Server Guest</div><div class="text-xs text-gray-400 mt-1">Respected visitors with limited access.</div></div>
-                <div class="info-card bg-spider-panel border border-spider-border rounded p-4" id="spec-memer"><div class="font-bold text-green-400">🤡 Memer</div><div class="text-xs text-gray-400 mt-1">Active meme posters.</div></div>
-                <div class="info-card bg-spider-panel border border-spider-border rounded p-4" id="spec-artist"><div class="font-bold text-pink-400">🎨 Talented Artist</div><div class="text-xs text-gray-400 mt-1">Creators in Art Works.</div></div>
-                <div class="info-card bg-spider-panel border border-spider-border rounded p-4" id="spec-writer"><div class="font-bold text-purple-400">✍️ Writers</div><div class="text-xs text-gray-400 mt-1">Poets and storytellers.</div></div>
-                <div class="info-card bg-spider-panel border border-spider-border rounded p-4" id="spec-female"><div class="font-bold text-rose-300">🌸 Verified Female</div><div class="text-xs text-gray-400 mt-1">Trusted verified members.</div></div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="info-card glass-card rounded-xl p-5" id="spec-bff"><div class="font-bold text-white text-lg">🤝 Best Friends</div><div class="text-xs text-gray-400 mt-2">Senpai's closest companions.</div></div>
+                <div class="info-card glass-card rounded-xl p-5" id="spec-apex"><div class="font-bold text-yellow-400 text-lg">🏆 Apex Spiders</div><div class="text-xs text-gray-400 mt-2">Great achievers of the last year.</div></div>
+                <div class="info-card glass-card rounded-xl p-5" id="spec-guest"><div class="font-bold text-white text-lg">🎫 Server Guest</div><div class="text-xs text-gray-400 mt-2">Respected visitors with limited access.</div></div>
+                <div class="info-card glass-card rounded-xl p-5" id="spec-memer"><div class="font-bold text-green-400 text-lg">🤡 Memer</div><div class="text-xs text-gray-400 mt-2">Active meme posters.</div></div>
+                <div class="info-card glass-card rounded-xl p-5" id="spec-artist"><div class="font-bold text-pink-400 text-lg">🎨 Artist</div><div class="text-xs text-gray-400 mt-2">Creators in Art Works.</div></div>
+                <div class="info-card glass-card rounded-xl p-5" id="spec-writer"><div class="font-bold text-purple-400 text-lg">✍️ Writers</div><div class="text-xs text-gray-400 mt-2">Poets and storytellers.</div></div>
+                <div class="info-card glass-card rounded-xl p-5 col-span-2" id="spec-female"><div class="font-bold text-rose-300 text-lg">🌸 Verified Female</div><div class="text-xs text-gray-400 mt-2">Trusted verified members of the community.</div></div>
                 
-                <div class="info-card bg-spider-panel border border-[#ff73fa] shadow-[0_0_10px_rgba(255,115,250,0.2)] rounded p-4 col-span-2 md:col-span-4 flex items-center justify-between" id="spec-crystal">
+                <div class="info-card glass-card border border-[#ff73fa]/50 shadow-[0_0_20px_rgba(255,115,250,0.15)] rounded-xl p-6 col-span-2 md:col-span-4 flex flex-col md:flex-row items-center justify-between gap-4" id="spec-crystal">
                     <div>
-                        <div class="font-bold text-[#ff73fa] text-lg">💎 Crystals (Boosters)</div>
-                        <div class="text-sm text-gray-300 mt-1">Supporters who boost the server. Gain higher-level perks and exclusive channels where SenpaiSpider is active.</div>
+                        <div class="font-display font-bold text-[#ff73fa] text-2xl">💎 Crystals (Boosters)</div>
+                        <div class="text-sm text-gray-300 mt-2 max-w-2xl">Supporters who boost the server. Gain higher-level perks and exclusive channels where SenpaiSpider is active.</div>
                     </div>
-                    <button onclick="copyLink('spec-crystal', this)" class="text-xs bg-spider-dark text-spider-text px-3 py-2 rounded border border-spider-border">🔗 Copy</button>
+                    <button onclick="copyLink('spec-crystal', this)" class="text-xs bg-black text-spider-text hover:text-white px-4 py-2 rounded-lg border border-spider-border transition whitespace-nowrap">🔗 Snipe Link</button>
                 </div>
             </div>
         </section>
 
         <section id="levels" class="category-section">
-            <div class="mb-6 border-b border-spider-border pb-2">
-                <h2 class="text-3xl font-bold text-white flex items-center gap-2"><span class="text-spider-red">|</span> Leveling Rewards</h2>
-                <p class="text-spider-text mt-1">Chat actively to earn XP and unlock these exclusive server perks.</p>
+            <div class="mb-8 flex items-end gap-4 border-b border-spider-border/50 pb-4">
+                <h2 class="text-4xl font-display font-bold text-white"><span class="text-spider-red">05.</span> Level Rewards</h2>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-4 flex items-center gap-4" id="lvl-5">
-                    <div class="w-12 h-12 rounded bg-spider-dark border border-spider-border flex items-center justify-center font-black text-xl text-gray-400">5</div>
-                    <div class="text-sm text-gray-300">First step after beginner.</div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                <div class="info-card glass-card rounded-xl p-4 flex items-center gap-4 group" id="lvl-10">
+                    <div class="w-14 h-14 rounded-lg bg-black border border-spider-border flex items-center justify-center font-display font-black text-2xl text-gray-300 group-hover:border-white transition">10</div>
+                    <div class="text-sm text-gray-300">Change your nickname.</div>
                 </div>
-                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-4 flex items-center gap-4" id="lvl-10">
-                    <div class="w-12 h-12 rounded bg-spider-dark border border-spider-border flex items-center justify-center font-black text-xl text-gray-300">10</div>
-                    <div class="text-sm text-gray-300">Ability to change your nickname.</div>
+                <div class="info-card glass-card rounded-xl p-4 flex items-center gap-4 group" id="lvl-20">
+                    <div class="w-14 h-14 rounded-lg bg-black border border-spider-border flex items-center justify-center font-display font-black text-2xl text-blue-400 group-hover:border-blue-400 transition">20</div>
+                    <div class="text-sm text-gray-300">External emojis + Screen share/Cam.</div>
                 </div>
-                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-4 flex items-center gap-4" id="lvl-20">
-                    <div class="w-12 h-12 rounded bg-spider-dark border border-spider-border flex items-center justify-center font-black text-xl text-blue-400">20</div>
-                    <div class="text-sm text-gray-300">External emojis + Screen share/Camera in VC.</div>
-                </div>
-                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-4 flex items-center gap-4" id="lvl-30">
-                    <div class="w-12 h-12 rounded bg-spider-dark border border-spider-border flex items-center justify-center font-black text-xl text-green-400">30</div>
+                <div class="info-card glass-card rounded-xl p-4 flex items-center gap-4 group" id="lvl-30">
+                    <div class="w-14 h-14 rounded-lg bg-black border border-spider-border flex items-center justify-center font-display font-black text-2xl text-green-400 group-hover:border-green-400 transition">30</div>
                     <div class="text-sm text-gray-300">GIFs & Soundboard access.</div>
                 </div>
-                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-4 flex items-center gap-4" id="lvl-40">
-                    <div class="w-12 h-12 rounded bg-spider-dark border border-spider-border flex items-center justify-center font-black text-xl text-yellow-400">40</div>
-                    <div class="text-sm text-gray-300">Attach files in chat & Rename custom VC.</div>
+                <div class="info-card glass-card rounded-xl p-4 flex items-center gap-4 group" id="lvl-40">
+                    <div class="w-14 h-14 rounded-lg bg-black border border-spider-border flex items-center justify-center font-display font-black text-2xl text-yellow-400 group-hover:border-yellow-400 transition">40</div>
+                    <div class="text-sm text-gray-300">Attach files & Rename custom VC.</div>
                 </div>
-                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-4 flex items-center gap-4" id="lvl-50">
-                    <div class="w-12 h-12 rounded bg-spider-dark border border-spider-border flex items-center justify-center font-black text-xl text-orange-400">50</div>
-                    <div class="text-sm text-gray-300">Create private/public threads & External stickers.</div>
+                <div class="info-card glass-card rounded-xl p-4 flex items-center gap-4 group" id="lvl-50">
+                    <div class="w-14 h-14 rounded-lg bg-black border border-spider-border flex items-center justify-center font-display font-black text-2xl text-orange-400 group-hover:border-orange-400 transition">50</div>
+                    <div class="text-sm text-gray-300">Create threads & External stickers.</div>
                 </div>
 
-                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-4 flex items-center gap-4" id="lvl-60">
-                    <div class="w-12 h-12 rounded bg-spider-dark border border-spider-border flex items-center justify-center font-black text-xl text-spider-red">60</div>
-                    <div class="text-sm text-gray-300">Membership to Spider's Club & Spider's VC.</div>
+                <div class="info-card glass-card rounded-xl p-4 flex items-center gap-4 group border-spider-blue/30" id="lvl-60">
+                    <div class="w-14 h-14 rounded-lg bg-black border border-spider-blue/50 flex items-center justify-center font-display font-black text-2xl text-spider-blue shadow-[0_0_10px_rgba(37,99,235,0.3)] transition group-hover:shadow-[0_0_20px_rgba(37,99,235,0.6)]">60</div>
+                    <div class="text-sm text-gray-300">Spider's Club & Spider's VC.</div>
                 </div>
-                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-4 flex items-center gap-4" id="lvl-70">
-                    <div class="w-12 h-12 rounded bg-spider-dark border border-spider-border flex items-center justify-center font-black text-xl text-purple-400">70</div>
-                    <div class="text-sm text-gray-300">Special CMDs & External Soundboard access.</div>
+                
+                <div class="info-card glass-card rounded-xl p-4 flex items-center gap-4 group" id="lvl-70">
+                    <div class="w-14 h-14 rounded-lg bg-black border border-spider-border flex items-center justify-center font-display font-black text-2xl text-purple-400 group-hover:border-purple-400 transition">70</div>
+                    <div class="text-sm text-gray-300">Special CMDs & Ext. Soundboard.</div>
                 </div>
-                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-4 flex items-center gap-4" id="lvl-80">
-                    <div class="w-12 h-12 rounded bg-spider-dark border border-spider-border flex items-center justify-center font-black text-xl text-pink-500">80</div>
-                    <div class="text-sm text-gray-300">Special colour roles.</div>
-                </div>
-                <div class="info-card bg-spider-panel border border-spider-border rounded-lg p-4 flex items-center gap-4" id="lvl-90">
-                    <div class="w-12 h-12 rounded bg-spider-dark border border-spider-border flex items-center justify-center font-black text-xl text-red-600">90</div>
-                    <div class="text-sm text-gray-300">Special icon roles.</div>
-                </div>
-                <div class="info-card bg-spider-panel border border-red-500 shadow-[0_0_15px_rgba(230,36,41,0.3)] rounded-lg p-4 flex items-center gap-4 sm:col-span-2 lg:col-span-2" id="lvl-100">
-                    <div class="w-16 h-16 rounded-full bg-spider-red flex items-center justify-center font-black text-2xl text-white shadow-[0_0_10px_rgba(230,36,41,0.8)]">100</div>
-                    <div>
-                        <div class="font-bold text-white text-lg">Maxed Out Role</div>
-                        <div class="text-sm text-gray-300">Custom auto react & Talkshow/Event priority. You've reached the top.</div>
+
+                <div class="info-card glass-card border border-spider-red/50 shadow-[0_0_20px_rgba(230,36,41,0.2)] rounded-xl p-5 flex flex-col sm:flex-row items-center gap-5 sm:col-span-2 lg:col-span-2 group hover:shadow-[0_0_30px_rgba(230,36,41,0.4)] transition" id="lvl-100">
+                    <div class="w-20 h-20 shrink-0 rounded-full bg-gradient-to-br from-spider-red to-spider-darkred flex items-center justify-center font-display font-black text-3xl text-white shadow-[0_0_15px_rgba(230,36,41,0.8)] border-2 border-black relative">
+                        100
+                        <div class="absolute inset-0 rounded-full border border-spider-red animate-ping opacity-20"></div>
                     </div>
-                    <button onclick="copyLink('lvl-100', this)" class="ml-auto text-xs bg-spider-dark text-spider-text px-3 py-2 rounded border border-spider-border">🔗 Copy</button>
+                    <div class="text-center sm:text-left w-full">
+                        <div class="flex flex-col sm:flex-row justify-between items-center sm:items-start gap-2 w-full">
+                            <div class="font-display font-bold text-white text-xl">Maxed Out Role</div>
+                            <button onclick="copyLink('lvl-100', this)" class="text-xs bg-black text-spider-text hover:text-white hover:bg-spider-red px-3 py-1.5 rounded-lg border border-spider-border transition whitespace-nowrap">🔗 Snipe</button>
+                        </div>
+                        <div class="text-sm text-gray-300 mt-2">Custom auto react & Talkshow/Event priority. You've reached the very top of the server.</div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -418,26 +415,34 @@
 
     <script>
         // Tab Navigation Logic
-        function showCategory(categoryId) {
+        function showCategory(categoryId, btnElement) {
             // Update button styles
             document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('bg-spider-red', 'text-white');
-                btn.classList.add('bg-spider-dark', 'text-spider-text');
+                btn.classList.remove('active');
+                btn.style.background = 'rgba(0,0,0,0.5)';
+                btn.style.color = '#cbd5e1';
+                btn.style.borderColor = 'rgba(37, 99, 235, 0.4)';
             });
-            document.getElementById('btn-' + categoryId).classList.remove('bg-spider-dark', 'text-spider-text');
-            document.getElementById('btn-' + categoryId).classList.add('bg-spider-red', 'text-white');
+            
+            if(btnElement) {
+                btnElement.classList.add('active');
+                btnElement.style.background = 'linear-gradient(135deg, #991b1b, #e62429)';
+                btnElement.style.color = 'white';
+                btnElement.style.borderColor = '#e62429';
+            }
 
             // Show/Hide Sections
             const sections = document.querySelectorAll('.category-section');
             sections.forEach(section => {
                 if (categoryId === 'all' || section.id === categoryId) {
                     section.style.display = 'block';
+                    section.style.animation = 'fadeIn 0.5s ease forwards';
                 } else {
                     section.style.display = 'none';
                 }
             });
             
-            // Clear search bar when switching tabs
+            // Clear search bar
             document.getElementById('searchBar').value = '';
             searchContent(); 
         }
@@ -456,7 +461,6 @@
                 }
             });
             
-            // If searching, ensure all sections are visible so cards can be found
             if(input.length > 0) {
                 document.querySelectorAll('.category-section').forEach(sec => sec.style.display = 'block');
             }
@@ -464,52 +468,198 @@
 
         // Mod Sniper Link Logic
         function copyLink(id, btnElement) {
-            // Build the URL
             const url = window.location.href.split('#')[0] + '#' + id;
-            
             navigator.clipboard.writeText(url).then(() => {
                 const originalText = btnElement.innerText;
-                const originalClasses = btnElement.className;
-                
-                // Visual feedback
-                btnElement.innerText = "✅ Copied!";
-                btnElement.classList.add('bg-green-600', 'text-white', 'border-green-500');
-                btnElement.classList.remove('bg-spider-dark', 'text-spider-text');
+                btnElement.innerText = "🎯 Sniped!";
+                btnElement.style.background = '#e62429';
+                btnElement.style.color = 'white';
                 
                 setTimeout(() => {
                     btnElement.innerText = originalText;
-                    btnElement.className = originalClasses;
+                    btnElement.style.background = '';
+                    btnElement.style.color = '';
                 }, 2000);
             });
         }
 
-        // On Load: Check if a user clicked a Mod Sniper Link
+        // Check for Sniper Links on Load
         window.onload = function() {
             if(window.location.hash) {
                 const id = window.location.hash.substring(1);
                 const targetElement = document.getElementById(id);
                 
                 if (targetElement) {
-                    // Make sure the section is visible
                     const parentSection = targetElement.closest('.category-section');
-                    showCategory(parentSection.id);
+                    // Find the button associated with this section (hacky but works for this structure)
+                    const btnId = parentSection.id;
+                    const buttons = document.querySelectorAll('.nav-btn');
+                    let targetBtn = buttons[0]; // default to 'all'
+                    buttons.forEach(b => { if(b.innerText.toLowerCase().includes(btnId.split('-')[0])) targetBtn = b; });
                     
-                    // Add the glowing red pulse animation
+                    showCategory(parentSection.id, targetBtn);
                     targetElement.classList.add('targeted');
                     
-                    // Smooth scroll to it, leaving some space at the top for the sticky header
                     setTimeout(() => {
-                        const y = targetElement.getBoundingClientRect().top + window.scrollY - 100;
+                        const y = targetElement.getBoundingClientRect().top + window.scrollY - 120;
                         window.scrollTo({top: y, behavior: 'smooth'});
                     }, 300);
                     
-                    // Remove the animation after 6 seconds so it doesn't get annoying
-                    setTimeout(() => {
-                        targetElement.classList.remove('targeted');
-                    }, 6000);
+                    setTimeout(() => { targetElement.classList.remove('targeted'); }, 6000);
                 }
             }
+            // Initialize canvas animation
+            initCanvas();
         };
+
+        // --- Interactive Spider Web Canvas Animation ---
+        function initCanvas() {
+            const canvas = document.getElementById('webCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Set canvas to full window
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            let particlesArray = [];
+            
+            // Mouse interaction
+            let mouse = {
+                x: null,
+                y: null,
+                radius: (canvas.height/8) * (canvas.width/8)
+            };
+            
+            window.addEventListener('mousemove', function(event) {
+                mouse.x = event.x;
+                mouse.y = event.y;
+            });
+            
+            window.addEventListener('mouseout', function() {
+                mouse.x = undefined;
+                mouse.y = undefined;
+            });
+
+            // Handle Resize
+            window.addEventListener('resize', function() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                mouse.radius = (canvas.height/8) * (canvas.width/8);
+                initParticles();
+            });
+
+            // Create Particle
+            class Particle {
+                constructor(x, y, directionX, directionY, size, color) {
+                    this.x = x;
+                    this.y = y;
+                    this.directionX = directionX;
+                    this.directionY = directionY;
+                    this.size = size;
+                    this.color = color;
+                }
+                
+                // Draw particle
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+                    ctx.fillStyle = this.color;
+                    ctx.fill();
+                }
+                
+                // Check position, mouse collision, move
+                update() {
+                    // Bounce off edges
+                    if (this.x > canvas.width || this.x < 0) { this.directionX = -this.directionX; }
+                    if (this.y > canvas.height || this.y < 0) { this.directionY = -this.directionY; }
+                    
+                    // Collision detection - mouse position / particle position
+                    let dx = mouse.x - this.x;
+                    let dy = mouse.y - this.y;
+                    let distance = Math.sqrt(dx*dx + dy*dy);
+                    
+                    if (distance < mouse.radius + this.size) {
+                        if (mouse.x < this.x && this.x < canvas.width - this.size * 10) { this.x += 1; }
+                        if (mouse.x > this.x && this.x > this.size * 10) { this.x -= 1; }
+                        if (mouse.y < this.y && this.y < canvas.height - this.size * 10) { this.y += 1; }
+                        if (mouse.y > this.y && this.y > this.size * 10) { this.y -= 1; }
+                    }
+                    
+                    // Move particle
+                    this.x += this.directionX;
+                    this.y += this.directionY;
+                    this.draw();
+                }
+            }
+
+            function initParticles() {
+                particlesArray = [];
+                // Number of particles depends on screen size
+                let numberOfParticles = (canvas.height * canvas.width) / 12000;
+                // Cap particles to prevent lag on huge screens
+                if (numberOfParticles > 150) numberOfParticles = 150;
+                
+                for (let i = 0; i < numberOfParticles; i++) {
+                    let size = (Math.random() * 2) + 1;
+                    let x = (Math.random() * ((innerWidth - size * 2) - (size * 2)) + size * 2);
+                    let y = (Math.random() * ((innerHeight - size * 2) - (size * 2)) + size * 2);
+                    let directionX = (Math.random() * 1) - 0.5;
+                    let directionY = (Math.random() * 1) - 0.5;
+                    // Mix of dark red and dark blue particles
+                    let color = Math.random() > 0.5 ? '#2563eb' : '#e62429'; 
+                    
+                    particlesArray.push(new Particle(x, y, directionX, directionY, size, color));
+                }
+            }
+
+            function connect() {
+                let opacityValue = 1;
+                for (let a = 0; a < particlesArray.length; a++) {
+                    for (let b = a; b < particlesArray.length; b++) {
+                        let distance = ((particlesArray[a].x - particlesArray[b].x) * (particlesArray[a].x - particlesArray[b].x))
+                                     + ((particlesArray[a].y - particlesArray[b].y) * (particlesArray[a].y - particlesArray[b].y));
+                        
+                        // If particles are close, draw a line
+                        if (distance < (canvas.width/7) * (canvas.height/7)) {
+                            opacityValue = 1 - (distance/15000);
+                            if(opacityValue < 0) opacityValue = 0;
+                            
+                            // Determine line color based on particles connecting
+                            let r = 37, g = 99, bl = 235; // Default Blue
+                            if (particlesArray[a].color === '#e62429' || particlesArray[b].color === '#e62429') {
+                                r = 230; g = 36; bl = 41; // Mix in Red
+                            }
+                            
+                            ctx.strokeStyle = `rgba(${r}, ${g}, ${bl}, ${opacityValue * 0.4})`;
+                            ctx.lineWidth = 1;
+                            ctx.beginPath();
+                            ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
+                            ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
+                            ctx.stroke();
+                        }
+                    }
+                }
+            }
+
+            function animate() {
+                requestAnimationFrame(animate);
+                ctx.clearRect(0, 0, innerWidth, innerHeight);
+                for (let i = 0; i < particlesArray.length; i++) {
+                    particlesArray[i].update();
+                }
+                connect();
+            }
+
+            initParticles();
+            animate();
+        }
     </script>
+    <style>
+        /* Add a simple fade in animation for tab switching */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </body>
 </html>
